@@ -69,7 +69,11 @@
     "RESET": "Reset",
     "SELECT_OPTION": "Select an option",
     "REQUIRED": "This field is required",
-    "INVALID_EMAIL": "Please enter a valid email"
+    "INVALID_EMAIL": "Please enter a valid email",
+    "CONFIRM_PASSWORD": "Confirm Password",
+    "PASSWORDS_DONT_MATCH": "Passwords do not match",
+    "MIN_LENGTH": "Minimum {{min}} characters required",
+    "SUCCESS_MESSAGE": "Form submitted successfully!"
   },
   "TABLES": {
     "TITLE": "Tables",

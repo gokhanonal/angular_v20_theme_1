@@ -1,71 +1,58 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
-import { NgbDatepickerModule, NgbTimepickerModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDatepickerModule, NgbTimepickerModule, NgbAlertModule } from '@ng-bootstrap/ng-bootstrap';
+import { MultiSelectComponent, SelectOption } from '../../shared/components/multi-select/multi-select.component';
 
 @Component({
-    selector: 'app-forms-page',
-    standalone: true,
-    imports: [CommonModule, FormsModule, ReactiveFormsModule, TranslateModule, NgbDatepickerModule, NgbTimepickerModule],
-    template: `
+  selector: 'app-forms-page',
+  standalone: true,
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, TranslateModule, NgbDatepickerModule, NgbTimepickerModule, NgbAlertModule, MultiSelectComponent],
+  template: `
     <div class="page-header">
       <h2>{{ 'FORMS.TITLE' | translate }}</h2>
     </div>
 
-    <!-- Basic Inputs -->
+    <!-- Basic Inputs (Template-Driven Validation) -->
     <div class="card mb-4">
-      <div class="card-header"><h6 class="mb-0">{{ 'FORMS.BASIC_INPUTS' | translate }}</h6></div>
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h6 class="mb-0">{{ 'FORMS.BASIC_INPUTS' | translate }} (Template-Driven)</h6>
+      </div>
       <div class="card-body">
-        <div class="row g-3">
-          <div class="col-md-6">
-            <label class="form-label">{{ 'FORMS.FIRST_NAME' | translate }}</label>
-            <input type="text" class="form-control" placeholder="John">
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">{{ 'FORMS.LAST_NAME' | translate }}</label>
-            <input type="text" class="form-control" placeholder="Doe">
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">{{ 'FORMS.EMAIL' | translate }}</label>
-            <div class="input-group">
-              <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-              <input type="email" class="form-control" placeholder="john&#64;example.com">
+        <form #basicForm="ngForm">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">{{ 'FORMS.FIRST_NAME' | translate }} *</label>
+              <input type="text" class="form-control" name="templateFirstName" 
+                     [(ngModel)]="templateData.firstName" required #tFirstName="ngModel"
+                     [class.is-invalid]="tFirstName.invalid && tFirstName.touched"
+                     [class.is-valid]="tFirstName.valid && tFirstName.touched">
+              <div class="invalid-feedback" *ngIf="tFirstName.errors?.['required']">
+                {{ 'FORMS.REQUIRED' | translate }}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">{{ 'FORMS.EMAIL' | translate }} *</label>
+              <input type="email" class="form-control" name="templateEmail" 
+                     [(ngModel)]="templateData.email" required email #tEmail="ngModel"
+                     [class.is-invalid]="tEmail.invalid && tEmail.touched"
+                     [class.is-valid]="tEmail.valid && tEmail.touched">
+              <div class="invalid-feedback" *ngIf="tEmail.errors?.['required']">
+                {{ 'FORMS.REQUIRED' | translate }}.
+              </div>
+              <div class="invalid-feedback" *ngIf="tEmail.errors?.['email']">
+                {{ 'FORMS.INVALID_EMAIL' | translate }}.
+              </div>
             </div>
           </div>
-          <div class="col-md-6">
-            <label class="form-label">{{ 'FORMS.PASSWORD' | translate }}</label>
-            <div class="input-group">
-              <span class="input-group-text"><i class="bi bi-lock"></i></span>
-              <input [type]="showPassword ? 'text' : 'password'" class="form-control" placeholder="••••••••">
-              <button class="btn btn-outline-secondary" (click)="showPassword = !showPassword">
-                <i class="bi" [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
-              </button>
-            </div>
-          </div>
-          <div class="col-12">
-            <label class="form-label">{{ 'FORMS.MESSAGE' | translate }}</label>
-            <textarea class="form-control" rows="3" placeholder="Enter your message..."></textarea>
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Input with floating label</label>
-            <div class="form-floating">
-              <input type="text" class="form-control" id="floatingInput" placeholder="Type here">
-              <label for="floatingInput">Floating label</label>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Disabled & Readonly</label>
-            <input type="text" class="form-control mb-2" value="Disabled input" disabled>
-            <input type="text" class="form-control" value="Readonly input" readonly>
-          </div>
-        </div>
+        </form>
       </div>
     </div>
 
     <!-- Select -->
     <div class="card mb-4">
-      <div class="card-header"><h6 class="mb-0">{{ 'FORMS.SELECT' | translate }}</h6></div>
+      <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center"><h6 class="mb-0">{{ 'FORMS.SELECT' | translate }}</h6></div>
       <div class="card-body">
         <div class="row g-3">
           <div class="col-md-6">
@@ -86,11 +73,15 @@ import { NgbDatepickerModule, NgbTimepickerModule } from '@ng-bootstrap/ng-boots
               <option>Option D</option>
             </select>
           </div>
-          <div class="col-md-6">
-            <label class="form-label">Select sizes</label>
-            <select class="form-select form-select-sm mb-2"><option>Small</option></select>
-            <select class="form-select mb-2"><option>Default</option></select>
-            <select class="form-select form-select-lg"><option>Large</option></select>
+          
+          <div class="col-12">
+            <label class="form-label">Advanced Multi-Select (with Search & Chips)</label>
+            <app-multi-select 
+              [options]="multiSelectOptions" 
+              placeholder="Search and select options..."
+              [(ngModel)]="selectedValues">
+            </app-multi-select>
+            <div class="mt-2 small text-muted">Selected values: {{ selectedValues | json }}</div>
           </div>
         </div>
       </div>
@@ -111,10 +102,6 @@ import { NgbDatepickerModule, NgbTimepickerModule } from '@ng-bootstrap/ng-boots
               <input class="form-check-input" type="checkbox" id="check2">
               <label class="form-check-label" for="check2">Default checkbox</label>
             </div>
-            <div class="form-check mb-2">
-              <input class="form-check-input" type="checkbox" id="check3" disabled>
-              <label class="form-check-label" for="check3">Disabled checkbox</label>
-            </div>
           </div>
           <div class="col-md-4">
             <h6 class="mb-3">Radios</h6>
@@ -125,10 +112,6 @@ import { NgbDatepickerModule, NgbTimepickerModule } from '@ng-bootstrap/ng-boots
             <div class="form-check mb-2">
               <input class="form-check-input" type="radio" name="radio1" id="radio2">
               <label class="form-check-label" for="radio2">Default radio</label>
-            </div>
-            <div class="form-check mb-2">
-              <input class="form-check-input" type="radio" name="radio1" id="radio3" disabled>
-              <label class="form-check-label" for="radio3">Disabled radio</label>
             </div>
           </div>
           <div class="col-md-4">
@@ -141,114 +124,113 @@ import { NgbDatepickerModule, NgbTimepickerModule } from '@ng-bootstrap/ng-boots
               <input class="form-check-input" type="checkbox" id="switch2">
               <label class="form-check-label" for="switch2">Default switch</label>
             </div>
-            <div class="form-check form-switch mb-2">
-              <input class="form-check-input" type="checkbox" id="switch3" disabled>
-              <label class="form-check-label" for="switch3">Disabled switch</label>
-            </div>
-          </div>
-          <div class="col-12">
-            <h6 class="mb-3">Inline</h6>
-            <div class="d-flex gap-4 flex-wrap">
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" id="inlineCheck1" checked>
-                <label class="form-check-label" for="inlineCheck1">Inline 1</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" id="inlineCheck2">
-                <label class="form-check-label" for="inlineCheck2">Inline 2</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="inlineRadio" id="inlineRadio1" checked>
-                <label class="form-check-label" for="inlineRadio1">Radio 1</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="inlineRadio" id="inlineRadio2">
-                <label class="form-check-label" for="inlineRadio2">Radio 2</label>
-              </div>
-            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Date & Time Pickers -->
-    <div class="card mb-4">
-      <div class="card-header"><h6 class="mb-0">{{ 'FORMS.DATE_TIME' | translate }}</h6></div>
-      <div class="card-body">
-        <div class="row g-4">
-          <div class="col-md-6">
-            <label class="form-label">Date Picker (ng-bootstrap)</label>
-            <div class="input-group">
-              <input class="form-control" ngbDatepicker #dp="ngbDatepicker" placeholder="yyyy-mm-dd" [(ngModel)]="selectedDate">
-              <button class="btn btn-outline-secondary" (click)="dp.toggle()">
-                <i class="bi bi-calendar3"></i>
-              </button>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Time Picker (ng-bootstrap)</label>
-            <ngb-timepicker [(ngModel)]="selectedTime" [spinners]="true"></ngb-timepicker>
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">HTML Date Input</label>
-            <input type="date" class="form-control">
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">HTML DateTime-local Input</label>
-            <input type="datetime-local" class="form-control">
-          </div>
-        </div>
+    <!-- Form Validation (Reactive Forms) -->
+    <div class="card mb-4 border-primary">
+      <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h6 class="mb-0">{{ 'FORMS.VALIDATION' | translate }} (Reactive)</h6>
+        <span class="badge bg-light text-primary">Advanced</span>
       </div>
-    </div>
-
-    <!-- Form Validation -->
-    <div class="card mb-4">
-      <div class="card-header"><h6 class="mb-0">{{ 'FORMS.VALIDATION' | translate }}</h6></div>
       <div class="card-body">
+        <ngb-alert type="success" *ngIf="submitted" (closed)="submitted = false">
+          {{ 'FORMS.SUCCESS_MESSAGE' | translate }}
+        </ngb-alert>
+
         <form [formGroup]="validationForm" (ngSubmit)="onSubmit()">
           <div class="row g-3">
+            <!-- First Name -->
             <div class="col-md-6">
               <label class="form-label">{{ 'FORMS.FIRST_NAME' | translate }} *</label>
-              <input type="text" class="form-control" formControlName="firstName"
-                [class.is-invalid]="validationForm.get('firstName')?.invalid && validationForm.get('firstName')?.touched"
-                [class.is-valid]="validationForm.get('firstName')?.valid && validationForm.get('firstName')?.touched">
-              <div class="invalid-feedback">{{ 'FORMS.REQUIRED' | translate }}</div>
-              <div class="valid-feedback">Looks good!</div>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                <input type="text" class="form-control" formControlName="firstName"
+                  [class.is-invalid]="f['firstName'].invalid && f['firstName'].touched"
+                  [class.is-valid]="f['firstName'].valid && f['firstName'].touched">
+              </div>
+              <div class="invalid-feedback d-block" *ngIf="f['firstName'].invalid && f['firstName'].touched">
+                <span *ngIf="f['firstName'].errors?.['required']">{{ 'FORMS.REQUIRED' | translate }}</span>
+              </div>
             </div>
+
+            <!-- Email -->
             <div class="col-md-6">
               <label class="form-label">{{ 'FORMS.EMAIL' | translate }} *</label>
-              <input type="email" class="form-control" formControlName="email"
-                [class.is-invalid]="validationForm.get('email')?.invalid && validationForm.get('email')?.touched"
-                [class.is-valid]="validationForm.get('email')?.valid && validationForm.get('email')?.touched">
-              <div class="invalid-feedback">{{ 'FORMS.INVALID_EMAIL' | translate }}</div>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                <input type="email" class="form-control" formControlName="email"
+                  [class.is-invalid]="f['email'].invalid && f['email'].touched"
+                  [class.is-valid]="f['email'].valid && f['email'].touched">
+              </div>
+              <div class="invalid-feedback d-block" *ngIf="f['email'].invalid && f['email'].touched">
+                <span *ngIf="f['email'].errors?.['required']">{{ 'FORMS.REQUIRED' | translate }}</span>
+                <span *ngIf="f['email'].errors?.['email']">{{ 'FORMS.INVALID_EMAIL' | translate }}</span>
+              </div>
             </div>
+
+            <!-- Password -->
             <div class="col-md-6">
               <label class="form-label">{{ 'FORMS.PASSWORD' | translate }} *</label>
-              <input type="password" class="form-control" formControlName="password"
-                [class.is-invalid]="validationForm.get('password')?.invalid && validationForm.get('password')?.touched">
-              <div class="invalid-feedback">Minimum 6 characters required</div>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                <input [type]="showPassword ? 'text' : 'password'" class="form-control" formControlName="password"
+                  [class.is-invalid]="f['password'].invalid && f['password'].touched">
+                <button class="btn btn-outline-secondary" type="button" (click)="showPassword = !showPassword">
+                  <i class="bi" [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
+                </button>
+              </div>
+              <div class="invalid-feedback d-block" *ngIf="f['password'].invalid && f['password'].touched">
+                <span *ngIf="f['password'].errors?.['required']">{{ 'FORMS.REQUIRED' | translate }}</span>
+                <span *ngIf="f['password'].errors?.['minlength']">
+                  {{ 'FORMS.MIN_LENGTH' | translate: { min: f['password'].errors?.['minlength'].requiredLength } }}
+                </span>
+                <span *ngIf="f['password'].errors?.['pattern']">Needs at least one special character</span>
+              </div>
             </div>
+
+            <!-- Confirm Password -->
+            <div class="col-md-6">
+              <label class="form-label">{{ 'FORMS.CONFIRM_PASSWORD' | translate }} *</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-shield-check"></i></span>
+                <input [type]="showPassword ? 'text' : 'password'" class="form-control" formControlName="confirmPassword"
+                  [class.is-invalid]="f['confirmPassword'].invalid && f['confirmPassword'].touched"
+                  [class.is-valid]="f['confirmPassword'].valid && f['confirmPassword'].touched">
+              </div>
+              <div class="invalid-feedback d-block" *ngIf="f['confirmPassword'].invalid && f['confirmPassword'].touched">
+                <span *ngIf="f['confirmPassword'].errors?.['required']">{{ 'FORMS.REQUIRED' | translate }}</span>
+                <span *ngIf="f['confirmPassword'].errors?.['mustMatch']">{{ 'FORMS.PASSWORDS_DONT_MATCH' | translate }}</span>
+              </div>
+            </div>
+
+            <!-- Role Select -->
             <div class="col-md-6">
               <label class="form-label">{{ 'FORMS.SELECT' | translate }} *</label>
               <select class="form-select" formControlName="role"
-                [class.is-invalid]="validationForm.get('role')?.invalid && validationForm.get('role')?.touched">
+                [class.is-invalid]="f['role'].invalid && f['role'].touched">
                 <option value="">{{ 'FORMS.SELECT_OPTION' | translate }}</option>
                 <option value="admin">Admin</option>
                 <option value="user">User</option>
-                <option value="editor">Editor</option>
               </select>
-              <div class="invalid-feedback">{{ 'FORMS.REQUIRED' | translate }}</div>
+              <div class="invalid-feedback" *ngIf="f['role'].invalid && f['role'].touched">{{ 'FORMS.REQUIRED' | translate }}</div>
             </div>
+
             <div class="col-12">
               <div class="form-check">
                 <input class="form-check-input" type="checkbox" formControlName="agree" id="agreeCheck"
-                  [class.is-invalid]="validationForm.get('agree')?.invalid && validationForm.get('agree')?.touched">
-                <label class="form-check-label" for="agreeCheck">I agree to the terms and conditions</label>
+                  [class.is-invalid]="f['agree'].invalid && f['agree'].touched">
+                <label class="form-check-label" for="agreeCheck">I agree up the terms and conditions</label>
               </div>
             </div>
+
             <div class="col-12">
-              <button class="btn btn-gradient-primary me-2" type="submit">{{ 'FORMS.SUBMIT' | translate }}</button>
-              <button class="btn btn-outline-secondary" type="button" (click)="validationForm.reset()">{{ 'FORMS.RESET' | translate }}</button>
+              <button class="btn btn-gradient-primary me-2" type="submit" [disabled]="validationForm.invalid && validationForm.touched">
+                {{ 'FORMS.SUBMIT' | translate }}
+              </button>
+              <button class="btn btn-outline-secondary" type="button" (click)="onReset()">{{ 'FORMS.RESET' | translate }}</button>
             </div>
           </div>
         </form>
@@ -257,17 +239,13 @@ import { NgbDatepickerModule, NgbTimepickerModule } from '@ng-bootstrap/ng-boots
 
     <!-- Input Groups -->
     <div class="card mb-4">
-      <div class="card-header"><h6 class="mb-0">Input Groups</h6></div>
+      <div class="card-header"><h6 class="mb-0">Input Groups & Helpers</h6></div>
       <div class="card-body">
         <div class="row g-3">
           <div class="col-md-6">
             <div class="input-group mb-3">
               <span class="input-group-text">&#64;</span>
               <input type="text" class="form-control" placeholder="Username">
-            </div>
-            <div class="input-group mb-3">
-              <input type="text" class="form-control" placeholder="Amount">
-              <span class="input-group-text">.00</span>
             </div>
             <div class="input-group">
               <span class="input-group-text">$</span>
@@ -287,22 +265,75 @@ import { NgbDatepickerModule, NgbTimepickerModule } from '@ng-bootstrap/ng-boots
   `
 })
 export class FormsPageComponent {
-    showPassword = false;
-    selectedDate: any;
-    selectedTime = { hour: 13, minute: 30 };
-    validationForm: FormGroup;
+  showPassword = false;
+  submitted = false;
+  templateData = { firstName: '', email: '' };
+  selectedValues: any[] = ['angular', 'react'];
 
-    constructor(private fb: FormBuilder) {
-        this.validationForm = this.fb.group({
-            firstName: ['', Validators.required],
-            email: ['', [Validators.required, Validators.email]],
-            password: ['', [Validators.required, Validators.minLength(6)]],
-            role: ['', Validators.required],
-            agree: [false, Validators.requiredTrue]
-        });
-    }
+  multiSelectOptions: SelectOption[] = [
+    { label: 'Angular', value: 'angular' },
+    { label: 'React', value: 'react' },
+    { label: 'Vue', value: 'vue' },
+    { label: 'Svelte', value: 'svelte' },
+    { label: 'Next.js', value: 'next' },
+    { label: 'Nuxt.js', value: 'nuxt' },
+    { label: 'Bootstrap', value: 'bs' },
+    { label: 'Tailwind', value: 'tw' }
+  ];
 
-    onSubmit(): void {
-        this.validationForm.markAllAsTouched();
+  validationForm: FormGroup;
+
+  constructor(private fb: FormBuilder) {
+    this.validationForm = this.fb.group({
+      firstName: ['', [Validators.required, Validators.minLength(2)]],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [
+        Validators.required,
+        Validators.minLength(6),
+        Validators.pattern(/[!@#$%^&*(),.?":{}|<>]/)
+      ]],
+      confirmPassword: ['', Validators.required],
+      role: ['', Validators.required],
+      agree: [false, Validators.requiredTrue]
+    }, {
+      validators: this.mustMatch('password', 'confirmPassword')
+    });
+  }
+
+  get f() { return this.validationForm.controls; }
+
+  mustMatch(controlName: string, matchingControlName: string) {
+    return (group: AbstractControl): ValidationErrors | null => {
+      const control = group.get(controlName);
+      const matchingControl = group.get(matchingControlName);
+
+      if (!control || !matchingControl) return null;
+
+      if (matchingControl.errors && !matchingControl.errors['mustMatch']) {
+        return null;
+      }
+
+      if (control.value !== matchingControl.value) {
+        matchingControl.setErrors({ mustMatch: true });
+      } else {
+        matchingControl.setErrors(null);
+      }
+      return null;
+    };
+  }
+
+  onSubmit(): void {
+    this.submitted = false;
+    if (this.validationForm.invalid) {
+      this.validationForm.markAllAsTouched();
+      return;
     }
+    this.submitted = true;
+    console.log('Form Submitted', this.validationForm.value);
+  }
+
+  onReset(): void {
+    this.submitted = false;
+    this.validationForm.reset();
+  }
 }

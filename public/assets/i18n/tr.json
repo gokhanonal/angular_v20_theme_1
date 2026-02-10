@@ -69,7 +69,11 @@
         "RESET": "Sıfırla",
         "SELECT_OPTION": "Bir seçenek seçin",
         "REQUIRED": "Bu alan zorunludur",
-        "INVALID_EMAIL": "Lütfen geçerli bir e-posta girin"
+        "INVALID_EMAIL": "Lütfen geçerli bir e-posta girin",
+        "CONFIRM_PASSWORD": "Şifre Tekrar",
+        "PASSWORDS_DONT_MATCH": "Şifreler eşleşmiyor",
+        "MIN_LENGTH": "En az {{min}} karakter gereklidir",
+        "SUCCESS_MESSAGE": "Form başarıyla gönderildi!"
     },
     "TABLES": {
         "TITLE": "Tablolar",

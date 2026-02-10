@@ -5,19 +5,20 @@ import { ThemeService } from '../services/theme.service';
 import { LoggerService } from '../services/logger.service';
 import { environment } from '../../environments/environment';
 import { CommonModule } from '@angular/common';
+import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 
 interface MenuItem {
-    label: string;
-    icon: string;
-    route?: string;
-    children?: MenuItem[];
+  label: string;
+  icon: string;
+  route?: string;
+  children?: MenuItem[];
 }
 
 @Component({
-    selector: 'app-layout',
-    standalone: true,
-    imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, TranslateModule],
-    template: `
+  selector: 'app-layout',
+  standalone: true,
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, TranslateModule, NgbDropdownModule],
+  template: `
     <!-- Sidebar -->
     <aside class="sidebar" [class.collapsed]="sidebarCollapsed()">
       <div class="sidebar-brand">
@@ -89,22 +90,22 @@ interface MenuItem {
           </button>
 
           <!-- Language -->
-          <div class="dropdown">
-            <button class="btn-icon dropdown-toggle" data-bs-toggle="dropdown">
+          <div class="dropdown" ngbDropdown>
+            <button class="btn-icon dropdown-toggle" ngbDropdownToggle>
               <i class="bi bi-translate"></i>
             </button>
-            <ul class="dropdown-menu dropdown-menu-end">
-              <li><a class="dropdown-item" (click)="switchLang('en')">🇬🇧 English</a></li>
-              <li><a class="dropdown-item" (click)="switchLang('tr')">🇹🇷 Türkçe</a></li>
+            <ul class="dropdown-menu dropdown-menu-end" ngbDropdownMenu>
+              <li><button class="dropdown-item" (click)="switchLang('en')">🇬🇧 English</button></li>
+              <li><button class="dropdown-item" (click)="switchLang('tr')">🇹🇷 Türkçe</button></li>
             </ul>
           </div>
 
           <!-- User -->
-          <div class="dropdown">
-            <button class="user-avatar dropdown-toggle" data-bs-toggle="dropdown">
+          <div class="dropdown" ngbDropdown>
+            <button class="user-avatar dropdown-toggle" ngbDropdownToggle>
               <div class="avatar avatar-sm" style="background: var(--gradient-primary)">JD</div>
             </button>
-            <ul class="dropdown-menu dropdown-menu-end">
+            <ul class="dropdown-menu dropdown-menu-end" ngbDropdownMenu>
               <li><a class="dropdown-item" routerLink="/profile"><i class="bi bi-person me-2"></i>{{ 'HEADER.PROFILE' | translate }}</a></li>
               <li><a class="dropdown-item"><i class="bi bi-gear me-2"></i>{{ 'HEADER.SETTINGS' | translate }}</a></li>
               <li><hr class="dropdown-divider"></li>
@@ -129,7 +130,7 @@ interface MenuItem {
     <!-- Mobile overlay -->
     <div class="sidebar-overlay" *ngIf="!sidebarCollapsed()" (click)="toggleSidebar()"></div>
   `,
-    styles: [`
+  styles: [`
     :host { display: flex; min-height: 100vh; }
 
     // === Sidebar ===
@@ -368,54 +369,54 @@ interface MenuItem {
   `]
 })
 export class LayoutComponent {
-    sidebarCollapsed = signal(false);
-    openMenus = signal<Record<string, boolean>>({});
-    environment = environment;
+  sidebarCollapsed = signal(false);
+  openMenus = signal<Record<string, boolean>>({});
+  environment = environment;
 
-    menuItems: MenuItem[] = [
-        { label: 'SIDEBAR.DASHBOARD', icon: 'bi-grid-1x2-fill', route: '/dashboard' },
-        {
-            label: 'SIDEBAR.COMPONENTS', icon: 'bi-layers-fill',
-            children: [
-                { label: 'SIDEBAR.UI_ELEMENTS', icon: '', route: '/ui-elements' },
-                { label: 'SIDEBAR.FORMS', icon: '', route: '/forms' },
-                { label: 'SIDEBAR.TABLES', icon: '', route: '/tables' },
-                { label: 'SIDEBAR.CHARTS', icon: '', route: '/charts' },
-                { label: 'SIDEBAR.MODALS', icon: '', route: '/modals' },
-                { label: 'SIDEBAR.NAVIGATION', icon: '', route: '/navigation' },
-                { label: 'SIDEBAR.ICONS', icon: '', route: '/icons' },
-                { label: 'SIDEBAR.GRID', icon: '', route: '/grid' },
-            ]
-        },
-        {
-            label: 'SIDEBAR.PAGES', icon: 'bi-file-earmark-text-fill',
-            children: [
-                { label: 'SIDEBAR.PROFILE', icon: '', route: '/profile' },
-                { label: 'SIDEBAR.LOGIN', icon: '', route: '/login' },
-                { label: 'SIDEBAR.REGISTER', icon: '', route: '/register' },
-                { label: 'SIDEBAR.NOT_FOUND', icon: '', route: '/404' },
-            ]
-        }
-    ];
-
-    constructor(
-        public themeService: ThemeService,
-        private translate: TranslateService,
-        private logger: LoggerService
-    ) {
-        this.logger.info('Layout initialized', { env: environment.envName });
+  menuItems: MenuItem[] = [
+    { label: 'SIDEBAR.DASHBOARD', icon: 'bi-grid-1x2-fill', route: '/dashboard' },
+    {
+      label: 'SIDEBAR.COMPONENTS', icon: 'bi-layers-fill',
+      children: [
+        { label: 'SIDEBAR.UI_ELEMENTS', icon: '', route: '/ui-elements' },
+        { label: 'SIDEBAR.FORMS', icon: '', route: '/forms' },
+        { label: 'SIDEBAR.TABLES', icon: '', route: '/tables' },
+        { label: 'SIDEBAR.CHARTS', icon: '', route: '/charts' },
+        { label: 'SIDEBAR.MODALS', icon: '', route: '/modals' },
+        { label: 'SIDEBAR.NAVIGATION', icon: '', route: '/navigation' },
+        { label: 'SIDEBAR.ICONS', icon: '', route: '/icons' },
+        { label: 'SIDEBAR.GRID', icon: '', route: '/grid' },
+      ]
+    },
+    {
+      label: 'SIDEBAR.PAGES', icon: 'bi-file-earmark-text-fill',
+      children: [
+        { label: 'SIDEBAR.PROFILE', icon: '', route: '/profile' },
+        { label: 'SIDEBAR.LOGIN', icon: '', route: '/login' },
+        { label: 'SIDEBAR.REGISTER', icon: '', route: '/register' },
+        { label: 'SIDEBAR.NOT_FOUND', icon: '', route: '/404' },
+      ]
     }
+  ];
 
-    toggleSidebar(): void {
-        this.sidebarCollapsed.update(v => !v);
-    }
+  constructor(
+    public themeService: ThemeService,
+    private translate: TranslateService,
+    private logger: LoggerService
+  ) {
+    this.logger.info('Layout initialized', { env: environment.envName });
+  }
 
-    toggleMenu(label: string): void {
-        this.openMenus.update(menus => ({ ...menus, [label]: !menus[label] }));
-    }
+  toggleSidebar(): void {
+    this.sidebarCollapsed.update(v => !v);
+  }
 
-    switchLang(lang: string): void {
-        this.translate.use(lang);
-        this.logger.info('Language switched', { lang });
-    }
+  toggleMenu(label: string): void {
+    this.openMenus.update(menus => ({ ...menus, [label]: !menus[label] }));
+  }
+
+  switchLang(lang: string): void {
+    this.translate.use(lang);
+    this.logger.info('Language switched', { lang });
+  }
 }
