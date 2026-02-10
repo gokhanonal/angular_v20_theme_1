@@ -15,6 +15,8 @@ export const routes: Routes = [
             { path: 'navigation', loadComponent: () => import('./pages/navigation/navigation.component').then(m => m.NavigationPageComponent) },
             { path: 'icons', loadComponent: () => import('./pages/icons/icons.component').then(m => m.IconsComponent) },
             { path: 'grid', loadComponent: () => import('./pages/grid/grid.component').then(m => m.GridComponent) },
+            { path: 'file-upload', loadComponent: () => import('./pages/file-upload/file-upload.component').then(m => m.FileUploadComponent) },
+            { path: 'editor', loadComponent: () => import('./pages/editor/editor.component').then(m => m.EditorComponent) },
             { path: 'profile', loadComponent: () => import('./pages/profile/profile.component').then(m => m.ProfileComponent) },
         ]
     },
