@@ -558,6 +558,7 @@ export class LayoutComponent {
         { label: 'SIDEBAR.NAVIGATION', icon: '', route: '/navigation' },
         { label: 'SIDEBAR.ICONS', icon: '', route: '/icons' },
         { label: 'SIDEBAR.GRID', icon: '', route: '/grid' },
+        { label: 'SIDEBAR.FILE_UPLOAD', icon: '', route: '/file-upload' },
       ]
     },
     {
