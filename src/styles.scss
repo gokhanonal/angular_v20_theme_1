@@ -1,0 +1,284 @@
+// Bootstrap
+@import 'bootstrap/scss/bootstrap';
+
+// Bootstrap Icons
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+
+// Google Font
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+// === CSS Custom Properties for Theme ===
+:root {
+  --font-family: 'Inter', sans-serif;
+  --sidebar-width: 260px;
+  --sidebar-collapsed-width: 0px;
+  --header-height: 60px;
+  --border-radius: 0.75rem;
+  --transition-speed: 0.3s;
+
+  // Light theme colors
+  --bg-body: #f0f2f5;
+  --bg-card: #ffffff;
+  --bg-sidebar: linear-gradient(195deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  --text-sidebar: #a8b2c1;
+  --text-sidebar-active: #ffffff;
+  --bg-sidebar-active: rgba(255, 255, 255, 0.12);
+  --bg-header: rgba(255, 255, 255, 0.85);
+  --text-primary: #1a1a2e;
+  --text-secondary: #6c757d;
+  --border-color: #e9ecef;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-success: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  --gradient-danger: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+  --gradient-warning: linear-gradient(135deg, #f2994a 0%, #f2c94c 100%);
+  --gradient-info: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%);
+}
+
+[data-theme="dark"] {
+  --bg-body: #0f0f23;
+  --bg-card: #1a1a35;
+  --bg-sidebar: linear-gradient(195deg, #0d0d1a 0%, #1a1a35 50%, #0f0f23 100%);
+  --text-sidebar: #8892a4;
+  --text-sidebar-active: #e2e8f0;
+  --bg-sidebar-active: rgba(255, 255, 255, 0.08);
+  --bg-header: rgba(26, 26, 53, 0.9);
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --border-color: #2d2d50;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+// === Global ===
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-family);
+  background: var(--bg-body);
+  color: var(--text-primary);
+  transition: background var(--transition-speed), color var(--transition-speed);
+  overflow-x: hidden;
+}
+
+// === Scrollbar ===
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(108, 117, 125, 0.3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(108, 117, 125, 0.5); }
+
+// === Card ===
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-speed);
+
+  &:hover {
+    box-shadow: var(--shadow-md);
+  }
+}
+
+.card-header {
+  background: transparent;
+  border-bottom: 1px solid var(--border-color);
+  font-weight: 600;
+}
+
+// === Gradient Cards ===
+.gradient-card {
+  border: none;
+  color: #fff;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 50%;
+  }
+
+  &.primary { background: var(--gradient-primary); }
+  &.success { background: var(--gradient-success); }
+  &.danger { background: var(--gradient-danger); }
+  &.warning { background: var(--gradient-warning); }
+  &.info { background: var(--gradient-info); }
+}
+
+// === Buttons ===
+.btn {
+  border-radius: 0.5rem;
+  font-weight: 500;
+  padding: 0.5rem 1.25rem;
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.btn-gradient-primary {
+  background: var(--gradient-primary);
+  border: none;
+  color: #fff;
+  &:hover { opacity: 0.9; color: #fff; }
+}
+
+.btn-gradient-success {
+  background: var(--gradient-success);
+  border: none;
+  color: #fff;
+  &:hover { opacity: 0.9; color: #fff; }
+}
+
+.btn-gradient-danger {
+  background: var(--gradient-danger);
+  border: none;
+  color: #fff;
+  &:hover { opacity: 0.9; color: #fff; }
+}
+
+// === Form Controls ===
+.form-control, .form-select {
+  background: var(--bg-card);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+
+  &:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    background: var(--bg-card);
+    color: var(--text-primary);
+  }
+}
+
+// === Tables ===
+.table {
+  color: var(--text-primary);
+
+  th {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    border-bottom: 2px solid var(--border-color);
+  }
+
+  td {
+    vertical-align: middle;
+    border-bottom: 1px solid var(--border-color);
+  }
+}
+
+// === Avatar ===
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-weight: 600;
+  color: #fff;
+  overflow: hidden;
+
+  &.avatar-sm { width: 32px; height: 32px; font-size: 0.75rem; }
+  &.avatar-md { width: 40px; height: 40px; font-size: 0.875rem; }
+  &.avatar-lg { width: 56px; height: 56px; font-size: 1.25rem; }
+  &.avatar-xl { width: 80px; height: 80px; font-size: 1.75rem; }
+
+  img { width: 100%; height: 100%; object-fit: cover; }
+}
+
+// === Animations ===
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.animate-fade-in {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+.animate-slide-in {
+  animation: slideInLeft 0.3s ease-out;
+}
+
+// === Status Badges ===
+.status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+
+  &.active { background: #38ef7d; }
+  &.inactive { background: #ef4444; }
+  &.pending { background: #f59e0b; }
+}
+
+// === Page header ===
+.page-header {
+  margin-bottom: 1.5rem;
+
+  h2 {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--text-primary);
+  }
+
+  p {
+    color: var(--text-secondary);
+    margin-bottom: 0;
+  }
+}
+
+// === Demo grid ===
+.demo-col {
+  background: var(--gradient-primary);
+  color: #fff;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  text-align: center;
+  font-weight: 500;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+  opacity: 0.85;
+}
+
+// === Toast container ===
+.toast-container {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1100;
+}
