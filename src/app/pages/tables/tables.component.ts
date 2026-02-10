@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { NgbDropdownModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { CdkDragDrop, CdkDropList, CdkDrag, moveItemInArray } from '@angular/cdk/drag-drop';
 
 interface User {
   id: number;
@@ -35,7 +36,7 @@ interface SortState {
 @Component({
   selector: 'app-tables',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule, NgbDropdownModule, NgbTooltipModule],
+  imports: [CommonModule, FormsModule, TranslateModule, NgbDropdownModule, NgbTooltipModule, CdkDropList, CdkDrag],
   template: `
     <div class="page-header d-flex justify-content-between align-items-center mb-4">
       <div>
@@ -50,7 +51,7 @@ interface SortState {
           </button>
           <div class="dropdown-menu dropdown-menu-end p-3" ngbDropdownMenu style="min-width: 200px;">
             <h6 class="dropdown-header px-0 mb-2">Display Columns</h6>
-            @for (col of columns; track col.key) {
+            @for (col of columns(); track col.key) {
               @if (col.key !== 'actions') {
                 <div class="form-check mb-2">
                   <input class="form-check-input" type="checkbox" [id]="'col-' + col.key" 
@@ -101,12 +102,14 @@ interface SortState {
           <table class="table table-hover align-middle mb-0">
             <thead class="table-light">
               <!-- Header Row -->
-              <tr>
+              <tr cdkDropList cdkDropListOrientation="horizontal" (cdkDropListDropped)="drop($event)">
                 @for (col of visibleColumns(); track col.key) {
                   <th [class.sticky-left]="col.sticky === 'left'" 
                       [class.sticky-right]="col.sticky === 'right'"
                       [style.cursor]="col.sortable ? 'pointer' : 'default'"
-                      (click)="onSort(col, $event)">
+                      (click)="onSort(col, $event)"
+                      cdkDrag 
+                      [cdkDragDisabled]="!!col.sticky">
                     <div class="d-flex align-items-center justify-content-between gap-2">
                       <span class="text-nowrap">{{ col.label }}</span>
                       @if (col.sortable) {
@@ -400,6 +403,34 @@ interface SortState {
         box-shadow: 0 4px 10px rgba(102, 126, 234, 0.25);
     }
 
+    // === Drag & Drop Styles ===
+    .cdk-drag-preview {
+      background: var(--bg-header);
+      padding: 10px 20px;
+      border-radius: 4px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: var(--text-primary);
+      z-index: 2000;
+    }
+
+    .cdk-drag-placeholder {
+      opacity: 0.3;
+      background: rgba(102, 126, 234, 0.1) !important;
+    }
+
+    .cdk-drag-animating {
+      transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+    }
+
+    .cdk-drop-list-dragging th:not(.cdk-drag-placeholder) {
+      transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+    }
+
     [data-theme="dark"] {
       .filter-row td { background: #1a1a1a; }
       .bg-soft-success { background: rgba(52, 211, 153, 0.1); color: #34d399; }
@@ -416,7 +447,7 @@ export class TablesComponent {
   columnFilters = signal<Record<string, string>>({});
   sortStates = signal<SortState[]>([]);
 
-  columns: Column[] = [
+  columns = signal<Column[]>([
     { key: 'name', label: 'User', visible: true, sortable: true, filterable: true, sticky: 'left' },
     { key: 'email', label: 'Email', visible: true, sortable: true, filterable: true },
     { key: 'role', label: 'Role', visible: true, sortable: true, filterable: true },
@@ -425,7 +456,7 @@ export class TablesComponent {
     { key: 'phone', label: 'Phone', visible: false, sortable: false, filterable: true },
     { key: 'joinedDate', label: 'Joined', visible: true, sortable: true, filterable: false },
     { key: 'actions', label: 'Actions', visible: true, sortable: false, filterable: false, sticky: 'right' }
-  ];
+  ]);
 
   allUsers: User[] = [
     { id: 1, name: 'John Doe', email: 'john@example.com', role: 'Admin', status: 'Active', avatar: 'var(--gradient-primary)', initials: 'JD', location: 'New York, USA', phone: '+1 234 567 890', joinedDate: '2023-01-15', lastLogin: '2 hours ago' },
@@ -442,7 +473,7 @@ export class TablesComponent {
     { id: 12, name: 'Maria Garcia', email: 'maria@example.com', role: 'Admin', status: 'Active', avatar: 'var(--gradient-success)', initials: 'MG', location: 'Madrid, Spain', phone: '+34 91 123 45 67', joinedDate: '2023-12-01', lastLogin: '12 hours ago' },
   ];
 
-  visibleColumns = computed(() => this.columns.filter(c => c.visible));
+  visibleColumns = computed(() => this.columns().filter(c => c.visible));
 
   filteredResults = computed(() => {
     let results = [...this.allUsers];
@@ -540,8 +571,30 @@ export class TablesComponent {
     return sort ? sort.direction : null;
   }
 
+  drop(event: CdkDragDrop<string[]>): void {
+    const visibleCols = this.visibleColumns();
+    const prevIndex = event.previousIndex;
+    const currentIndex = event.currentIndex;
+
+    if (prevIndex === currentIndex) return;
+
+    // We need to map visible indices back to the main 'columns' array
+    const colToMove = visibleCols[prevIndex];
+    const targetCol = visibleCols[currentIndex];
+
+    this.columns.update(cols => {
+      const newCols = [...cols];
+      const mainPrevIndex = newCols.indexOf(colToMove);
+      const mainCurrentIndex = newCols.indexOf(targetCol);
+      moveItemInArray(newCols, mainPrevIndex, mainCurrentIndex);
+      return newCols;
+    });
+  }
+
   toggleColumn(col: Column): void {
-    col.visible = !col.visible;
+    this.columns.update(cols => {
+      return cols.map(c => c.key === col.key ? { ...c, visible: !c.visible } : c);
+    });
   }
 
   updateColumnFilter(key: string, value: string): void {

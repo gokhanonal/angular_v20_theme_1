@@ -7,6 +7,7 @@ import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 export interface SelectOption {
     label: string;
     value: any;
+    image?: string;
     [key: string]: any;
 }
 
@@ -27,6 +28,9 @@ export interface SelectOption {
         <div class="chips-container">
           @for (option of selectedOptions(); track option.value) {
             <span class="chip animate-fade-in">
+              @if (option.image) {
+                <img [src]="option.image" class="chip-image" [alt]="option.label">
+              }
               <span class="chip-label">{{ option.label }}</span>
               <button type="button" class="chip-remove" (click)="removeOption(option, $event)">
                 <i class="bi bi-x"></i>
@@ -70,7 +74,12 @@ export interface SelectOption {
                     (mousedown)="toggleOption(option, $event)"
                     (mouseenter)="activeIndex.set(i)">
               <div class="d-flex align-items-center justify-content-between w-100">
-                <span>{{ option.label }}</span>
+                <div class="d-flex align-items-center gap-2">
+                  @if (option.image) {
+                    <img [src]="option.image" class="option-image" [alt]="option.label">
+                  }
+                  <span>{{ option.label }}</span>
+                </div>
                 <i class="bi bi-check2 text-primary" *ngIf="isSelected(option)"></i>
               </div>
             </button>
@@ -145,6 +154,14 @@ export interface SelectOption {
       font-size: 1rem;
       
       &:hover { color: #fff; }
+    }
+
+    .chip-image {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #eee;
     }
 
     .placeholder {
@@ -226,6 +243,14 @@ export interface SelectOption {
         background: rgba(102, 126, 234, 0.1);
         font-weight: 600;
       }
+    }
+
+    .option-image {
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      object-fit: cover;
+      background: #eee;
     }
 
     ::-webkit-scrollbar { width: 4px; }

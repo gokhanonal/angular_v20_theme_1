@@ -74,14 +74,26 @@ import { MultiSelectComponent, SelectOption } from '../../shared/components/mult
             </select>
           </div>
           
-          <div class="col-12">
-            <label class="form-label">Advanced Multi-Select (with Search & Chips)</label>
+          <div class="col-md-6">
+            <label class="form-label">Frameworks (Text Only)</label>
             <app-multi-select 
               [options]="multiSelectOptions" 
-              placeholder="Search and select options..."
-              [(ngModel)]="selectedValues">
+              placeholder="Search frameworks..."
+              [(ngModel)]="selectedFrameworks">
             </app-multi-select>
-            <div class="mt-2 small text-muted">Selected values: {{ selectedValues | json }}</div>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Countries (with Flags)</label>
+            <app-multi-select 
+              [options]="countryOptions" 
+              placeholder="Search countries..."
+              [(ngModel)]="selectedCountries">
+            </app-multi-select>
+          </div>
+          <div class="col-12 mt-2 pt-2 border-top">
+            <div class="small text-muted mb-1">Frameworks: {{ selectedFrameworks | json }}</div>
+            <div class="small text-muted">Countries: {{ selectedCountries | json }}</div>
           </div>
         </div>
       </div>
@@ -268,17 +280,25 @@ export class FormsPageComponent {
   showPassword = false;
   submitted = false;
   templateData = { firstName: '', email: '' };
-  selectedValues: any[] = ['angular', 'react'];
+  selectedFrameworks: any[] = ['angular', 'react'];
+  selectedCountries: any[] = ['tr', 'us'];
 
   multiSelectOptions: SelectOption[] = [
     { label: 'Angular', value: 'angular' },
     { label: 'React', value: 'react' },
     { label: 'Vue', value: 'vue' },
-    { label: 'Svelte', value: 'svelte' },
-    { label: 'Next.js', value: 'next' },
-    { label: 'Nuxt.js', value: 'nuxt' },
-    { label: 'Bootstrap', value: 'bs' },
-    { label: 'Tailwind', value: 'tw' }
+    { label: 'Svelte', value: 'svelte' }
+  ];
+
+  countryOptions: SelectOption[] = [
+    { label: 'Turkey', value: 'tr', image: 'https://flagcdn.com/w40/tr.png' },
+    { label: 'United States', value: 'us', image: 'https://flagcdn.com/w40/us.png' },
+    { label: 'Germany', value: 'de', image: 'https://flagcdn.com/w40/de.png' },
+    { label: 'France', value: 'fr', image: 'https://flagcdn.com/w40/fr.png' },
+    { label: 'United Kingdom', value: 'gb', image: 'https://flagcdn.com/w40/gb.png' },
+    { label: 'Italy', value: 'it', image: 'https://flagcdn.com/w40/it.png' },
+    { label: 'Spain', value: 'es', image: 'https://flagcdn.com/w40/es.png' },
+    { label: 'Japan', value: 'jp', image: 'https://flagcdn.com/w40/jp.png' }
   ];
 
   validationForm: FormGroup;
