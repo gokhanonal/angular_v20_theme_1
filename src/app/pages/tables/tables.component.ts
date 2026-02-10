@@ -83,7 +83,7 @@ interface SortState {
             <div class="search-wrapper">
               <i class="bi bi-search search-icon"></i>
               <input type="text" class="form-control form-control-sm ps-5" style="width: 250px;"
-                placeholder="Global search..." [(ngModel)]="globalSearch" (ngModelChange)="currentPage.set(1)">
+                placeholder="Global search..." [ngModel]="globalSearch()" (ngModelChange)="globalSearch.set($event); currentPage.set(1)">
             </div>
           </div>
           <div class="sort-info small text-muted">
@@ -128,9 +128,9 @@ interface SortState {
                       <div class="filter-input-wrapper">
                         <input type="text" class="form-control form-control-sm filter-input" 
                                [placeholder]="'Filter ' + col.label"
-                               [(ngModel)]="columnFilters[col.key]"
-                               (ngModelChange)="currentPage.set(1)">
-                        <i class="bi bi-filter filter-icon" *ngIf="!columnFilters[col.key]"></i>
+                               [ngModel]="columnFilters()[col.key]"
+                               (ngModelChange)="updateColumnFilter(col.key, $event)">
+                        <i class="bi bi-filter filter-icon" *ngIf="!columnFilters()[col.key]"></i>
                       </div>
                     }
                   </td>
@@ -412,8 +412,8 @@ export class TablesComponent {
   Math = Math;
   pageSize = 10;
   currentPage = signal(1);
-  globalSearch = '';
-  columnFilters: Record<string, string> = {};
+  globalSearch = signal('');
+  columnFilters = signal<Record<string, string>>({});
   sortStates = signal<SortState[]>([]);
 
   columns: Column[] = [
@@ -446,21 +446,22 @@ export class TablesComponent {
 
   filteredResults = computed(() => {
     let results = [...this.allUsers];
+    const searchTerm = this.globalSearch().toLowerCase();
+    const filters = this.columnFilters();
 
     // Global Search
-    if (this.globalSearch) {
-      const term = this.globalSearch.toLowerCase();
+    if (searchTerm) {
       results = results.filter(u =>
-        u.name.toLowerCase().includes(term) ||
-        u.email.toLowerCase().includes(term) ||
-        u.role.toLowerCase().includes(term) ||
-        u.location.toLowerCase().includes(term)
+        u.name.toLowerCase().includes(searchTerm) ||
+        u.email.toLowerCase().includes(searchTerm) ||
+        u.role.toLowerCase().includes(searchTerm) ||
+        u.location.toLowerCase().includes(searchTerm)
       );
     }
 
     // Column Filters
-    Object.keys(this.columnFilters).forEach(key => {
-      const filterValue = this.columnFilters[key]?.toLowerCase();
+    Object.entries(filters).forEach(([key, value]) => {
+      const filterValue = value?.toLowerCase();
       if (filterValue) {
         results = results.filter(u => (u as any)[key]?.toString().toLowerCase().includes(filterValue));
       }
@@ -543,9 +544,14 @@ export class TablesComponent {
     col.visible = !col.visible;
   }
 
+  updateColumnFilter(key: string, value: string): void {
+    this.columnFilters.update(filters => ({ ...filters, [key]: value }));
+    this.currentPage.set(1);
+  }
+
   resetFilters(): void {
-    this.globalSearch = '';
-    this.columnFilters = {};
+    this.globalSearch.set('');
+    this.columnFilters.set({});
     this.sortStates.set([]);
     this.currentPage.set(1);
   }
