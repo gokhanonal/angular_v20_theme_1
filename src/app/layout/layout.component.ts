@@ -78,10 +78,45 @@ interface MenuItem {
           </div>
         </div>
         <div class="header-right">
-          <!-- Theme toggle -->
-          <button class="btn-icon" (click)="themeService.toggleTheme()" [title]="'HEADER.THEME_TOGGLE' | translate">
-            <i class="bi" [ngClass]="themeService.currentTheme() === 'dark' ? 'bi-sun-fill' : 'bi-moon-fill'"></i>
-          </button>
+          <!-- Theme selector -->
+          <div class="dropdown" ngbDropdown>
+            <button class="btn-icon dropdown-toggle" ngbDropdownToggle [title]="'HEADER.THEME_TOGGLE' | translate">
+              <i class="bi" [ngClass]="{
+                'bi-sun-fill': themeService.currentTheme() === 'light',
+                'bi-moon-fill': themeService.currentTheme() === 'dark',
+                'bi-palette-fill': themeService.currentTheme() === 'theme1',
+                'bi-window-sidebar': themeService.currentTheme() === 'theme2',
+                'bi-stars': themeService.currentTheme() === 'theme3'
+              }"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" ngbDropdownMenu>
+              <li>
+                <button class="dropdown-item d-flex align-items-center gap-2" (click)="themeService.setTheme('light')">
+                  <i class="bi bi-sun"></i> Light
+                </button>
+              </li>
+              <li>
+                <button class="dropdown-item d-flex align-items-center gap-2" (click)="themeService.setTheme('dark')">
+                  <i class="bi bi-moon"></i> Dark
+                </button>
+              </li>
+              <li>
+                <button class="dropdown-item d-flex align-items-center gap-2" (click)="themeService.setTheme('theme1')">
+                  <i class="bi bi-palette"></i> Theme1 (Pastel)
+                </button>
+              </li>
+              <li>
+                <button class="dropdown-item d-flex align-items-center gap-2" (click)="themeService.setTheme('theme2')">
+                  <i class="bi bi-window-sidebar"></i> Theme2 (Flat)
+                </button>
+              </li>
+              <li>
+                <button class="dropdown-item d-flex align-items-center gap-2" (click)="themeService.setTheme('theme3')">
+                  <i class="bi bi-stars"></i> Theme3 (Vibrant)
+                </button>
+              </li>
+            </ul>
+          </div>
 
           <!-- Notifications -->
           <div class="dropdown" ngbDropdown>

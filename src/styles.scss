@@ -36,6 +36,23 @@
   --gradient-danger: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
   --gradient-warning: linear-gradient(135deg, #f2994a 0%, #f2c94c 100%);
   --gradient-info: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%);
+
+  // Pastel Colors
+  --pastel-primary: #e0e7ff;
+  --pastel-secondary: #fce7f3;
+  --pastel-success: #d1fae5;
+  --pastel-info: #e0f2fe;
+  --pastel-warning: #fef3c7;
+  --pastel-danger: #fee2e2;
+  --pastel-dark: #f3f4f6;
+
+  --color-primary: #667eea;
+  --color-secondary: #ec4899;
+  --color-success: #10b981;
+  --color-info: #0ea5e9;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-dark: #1f2937;
 }
 
 [data-theme="dark"] {
@@ -52,6 +69,92 @@
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="theme1"] {
+  --bg-body: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-sidebar: linear-gradient(195deg, #6366f1 0%, #4f46e5 50%, #4338ca 100%);
+  --text-sidebar: #e0e7ff;
+  --text-sidebar-active: #ffffff;
+  --bg-sidebar-active: rgba(255, 255, 255, 0.15);
+  --bg-header: rgba(255, 255, 255, 0.95);
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --border-color: #f1f5f9;
+  --shadow-sm: 0 2px 4px rgba(99, 102, 241, 0.05);
+  --shadow-md: 0 10px 15px -3px rgba(99, 102, 241, 0.08);
+  --shadow-lg: 0 20px 25px -5px rgba(99, 102, 241, 0.1);
+  --color-primary: #6366f1;
+  --gradient-primary: linear-gradient(135deg, #818cf8 0%, #6366f1 100%);
+}
+
+[data-theme="theme2"] {
+  --bg-body: #f4f7fa;
+  --bg-card: #ffffff;
+  --bg-sidebar: #ffffff;
+  --text-sidebar: #5b626e;
+  --text-sidebar-active: #0d6efd;
+  --bg-sidebar-active: #f0f7ff;
+  --bg-header: #ffffff;
+  --text-primary: #2b3a4a;
+  --text-secondary: #8492a6;
+  --border-color: #ebf0f5;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+
+  // Flat Colors (No gradients)
+  --color-primary: #0d6efd;
+  --color-secondary: #6c757d;
+  --color-success: #198754;
+  --color-info: #0dcaf0;
+  --color-warning: #ffc107;
+  --color-danger: #dc3545;
+  --color-dark: #212529;
+
+  --gradient-primary: #0d6efd;
+  --gradient-success: #198754;
+  --gradient-danger: #dc3545;
+  --gradient-warning: #ffc107;
+  --gradient-info: #0dcaf0;
+
+  // Sidebar specific overrides for Theme2
+  .sidebar-brand .brand-text,
+  .sidebar-brand .brand-icon {
+    color: var(--text-primary);
+  }
+}
+
+[data-theme="theme3"] {
+  --bg-body: #fdfdfd;
+  --bg-card: #ffffff;
+  --bg-sidebar: #2c3e50;
+  --text-sidebar: #bdc3c7;
+  --text-sidebar-active: #ffffff;
+  --bg-sidebar-active: rgba(255, 255, 255, 0.1);
+  --bg-header: #ffffff;
+  --text-primary: #2c3e50;
+  --text-secondary: #7f8c8d;
+  --border-color: #ecf0f1;
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.1);
+
+  // Vibrant Flat Colors
+  --color-primary: #4ab1f1; // Sky Blue
+  --color-secondary: #7467ef; // Deep Purple
+  --color-success: #3cd4a0; // Greenish Cyan
+  --color-info: #35d7e5; // Bright Cyan
+  --color-warning: #f7941d; // Vibrant Orange
+  --color-danger: #e6194b; // Deep Pinkish Red
+  --color-dark: #2c3e50;
+
+  --gradient-primary: #4ab1f1;
+  --gradient-success: #3cd4a0;
+  --gradient-danger: #e6194b;
+  --gradient-warning: #f7941d;
+  --gradient-info: #35d7e5;
 }
 
 // === Global ===
@@ -212,6 +315,217 @@ body {
     box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
     background: var(--bg-card);
     color: var(--text-primary);
+  }
+}
+
+// === Colored Form Controls ===
+.form-check-input {
+  cursor: pointer;
+  border-width: 2px;
+  border-color: #dee2e6;
+
+  &:checked {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+  }
+
+  // Colored variants
+  &.check-primary:checked {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+  }
+
+  &.check-secondary:checked {
+    background-color: var(--color-secondary);
+    border-color: var(--color-secondary);
+  }
+
+  &.check-success:checked {
+    background-color: var(--color-success);
+    border-color: var(--color-success);
+  }
+
+  &.check-info:checked {
+    background-color: var(--color-info);
+    border-color: var(--color-info);
+  }
+
+  &.check-warning:checked {
+    background-color: var(--color-warning);
+    border-color: var(--color-warning);
+  }
+
+  &.check-danger:checked {
+    background-color: var(--color-danger);
+    border-color: var(--color-danger);
+  }
+
+  &.check-dark:checked {
+    background-color: var(--color-dark);
+    border-color: var(--color-dark);
+  }
+
+  // Outline variants (Simplified for now as Bootstrap's SVG checkmark is tricky to color via CSS only without filter)
+  &.check-outline-primary {
+    border-color: var(--color-primary);
+    background: transparent;
+  }
+
+  &.check-outline-secondary {
+    border-color: var(--color-secondary);
+    background: transparent;
+  }
+
+  &.check-outline-success {
+    border-color: var(--color-success);
+    background: transparent;
+  }
+
+  &.check-outline-info {
+    border-color: var(--color-info);
+    background: transparent;
+  }
+
+  &.check-outline-warning {
+    border-color: var(--color-warning);
+    background: transparent;
+  }
+
+  &.check-outline-danger {
+    border-color: var(--color-danger);
+    background: transparent;
+  }
+
+  &.check-outline-dark {
+    border-color: var(--color-dark);
+    background: transparent;
+  }
+}
+
+// === Toggle Switches ===
+.form-switch {
+  padding-left: 3em;
+
+  .form-check-input {
+    width: 3em;
+    height: 1.5em;
+    margin-left: -3em;
+    border-radius: 2em;
+
+    // Style-1: Squared with text
+    &.switch-style-1 {
+      border-radius: 4px;
+      width: 3.2em;
+      position: relative;
+
+      &::before {
+        content: 'OFF';
+        position: absolute;
+        right: 4px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 0.6rem;
+        font-weight: 700;
+        color: var(--text-secondary);
+        z-index: 1;
+      }
+
+      &:checked::before {
+        content: 'ON';
+        left: 4px;
+        right: auto;
+        color: #fff;
+      }
+    }
+
+    // Sizes
+    &.toggle-sm {
+      height: 1.2rem;
+      width: 2.4rem;
+      padding-left: 2.4rem;
+    }
+
+    &.toggle-md {
+      height: 1.5rem;
+      width: 3rem;
+    }
+
+    &.toggle-lg {
+      height: 1.8rem;
+      width: 3.6rem;
+    }
+
+    // Color Variants
+    &.switch-primary:checked {
+      background-color: var(--color-primary);
+      border-color: var(--color-primary);
+    }
+
+    &.switch-secondary:checked {
+      background-color: var(--color-secondary);
+      border-color: var(--color-secondary);
+    }
+
+    &.switch-success:checked {
+      background-color: var(--color-success);
+      border-color: var(--color-success);
+    }
+
+    &.switch-info:checked {
+      background-color: var(--color-info);
+      border-color: var(--color-info);
+    }
+
+    &.switch-warning:checked {
+      background-color: var(--color-warning);
+      border-color: var(--color-warning);
+    }
+
+    &.switch-danger:checked {
+      background-color: var(--color-danger);
+      border-color: var(--color-danger);
+    }
+
+    &.switch-dark:checked {
+      background-color: var(--color-dark);
+      border-color: var(--color-dark);
+    }
+
+    // Pastel variants (background when unchecked)
+    &.switch-pastel-primary {
+      background-color: var(--pastel-primary);
+      border-color: var(--pastel-primary);
+    }
+
+    &.switch-pastel-secondary {
+      background-color: var(--pastel-secondary);
+      border-color: var(--pastel-secondary);
+    }
+
+    &.switch-pastel-success {
+      background-color: var(--pastel-success);
+      border-color: var(--pastel-success);
+    }
+
+    &.switch-pastel-info {
+      background-color: var(--pastel-info);
+      border-color: var(--pastel-info);
+    }
+
+    &.switch-pastel-warning {
+      background-color: var(--pastel-warning);
+      border-color: var(--pastel-warning);
+    }
+
+    &.switch-pastel-danger {
+      background-color: var(--pastel-danger);
+      border-color: var(--pastel-danger);
+    }
+
+    &.switch-pastel-dark {
+      background-color: var(--pastel-dark);
+      border-color: var(--pastel-dark);
+    }
   }
 }
 

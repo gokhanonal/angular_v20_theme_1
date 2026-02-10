@@ -141,6 +141,94 @@ import { MultiSelectComponent, SelectOption } from '../../shared/components/mult
       </div>
     </div>
 
+    <!-- Colored Form Controls Showcase -->
+    <div class="card mb-4">
+      <div class="card-header bg-soft-info text-primary"><h6 class="mb-0">Colored & Pastel Form Controls</h6></div>
+      <div class="card-body">
+        <div class="row g-4">
+          <!-- Colored Checkboxes -->
+          <div class="col-md-3">
+            <h6 class="small fw-bold mb-3 text-uppercase">Colored Checkboxes</h6>
+            @for (color of colors; track color) {
+              <div class="form-check mb-2">
+                <input class="form-check-input check-{{color}}" type="checkbox" [id]="'check-' + color" checked>
+                <label class="form-check-label text-capitalize" [for]="'check-' + color">{{color}}</label>
+              </div>
+            }
+          </div>
+
+          <!-- Outline Checkboxes -->
+          <div class="col-md-3">
+            <h6 class="small fw-bold mb-3 text-uppercase">Outline Checkboxes</h6>
+            @for (color of colors; track color) {
+              <div class="form-check mb-2">
+                <input class="form-check-input check-outline-{{color}}" type="checkbox" [id]="'check-out-' + color" checked>
+                <label class="form-check-label text-capitalize" [for]="'check-out-' + color">{{color}}</label>
+              </div>
+            }
+          </div>
+
+          <!-- Toggle Switches Style-1 -->
+          <div class="col-md-3">
+            <h6 class="small fw-bold mb-3 text-uppercase">Switches Style-1 (Label)</h6>
+            @for (color of colors; track color) {
+              <div class="form-check form-switch mb-2">
+                <input class="form-check-input switch-style-1 switch-{{color}}" type="checkbox" [id]="'sw1-' + color" checked>
+                <label class="form-check-label text-capitalize ms-2" [for]="'sw1-' + color">{{color}}</label>
+              </div>
+            }
+          </div>
+
+          <!-- Toggle Switches Style-2 -->
+          <div class="col-md-3">
+            <h6 class="small fw-bold mb-3 text-uppercase">Switches Style-2 (Pastel)</h6>
+            @for (color of colors; track color) {
+              <div class="form-check form-switch mb-2">
+                <input class="form-check-input switch-pastel-{{color}} switch-{{color}}" type="checkbox" [id]="'sw2-' + color" checked>
+                <label class="form-check-label text-capitalize" [for]="'sw2-' + color">{{color}}</label>
+              </div>
+            }
+          </div>
+        </div>
+
+        <hr class="my-4 op-02">
+
+        <div class="row g-4">
+          <!-- Switch Sizes -->
+          <div class="col-md-6">
+            <h6 class="small fw-bold mb-3 text-uppercase">Toggle Switch Sizes</h6>
+            <div class="d-flex align-items-center gap-4 flex-wrap">
+              <div class="form-check form-switch">
+                <input class="form-check-input toggle-sm switch-success" type="checkbox" id="size-sm" checked>
+                <label class="form-check-label ms-2" for="size-sm">Small</label>
+              </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input toggle-md switch-secondary" type="checkbox" id="size-md" checked>
+                <label class="form-check-label ms-2" for="size-md">Default</label>
+              </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input toggle-lg switch-info" type="checkbox" id="size-lg" checked>
+                <label class="form-check-label ms-2" for="size-lg">Large</label>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Radio Colors -->
+          <div class="col-md-6">
+            <h6 class="small fw-bold mb-3 text-uppercase">Colored Radios</h6>
+            <div class="d-flex gap-3 flex-wrap">
+              @for (color of colors; track color) {
+                <div class="form-check">
+                  <input class="form-check-input check-{{color}}" type="radio" name="radioColors" [id]="'radio-' + color" [checked]="color === 'primary'">
+                  <label class="form-check-label text-capitalize" [for]="'radio-' + color">{{color}}</label>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Form Validation (Reactive Forms) -->
     <div class="card mb-4 border-primary">
       <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
@@ -282,6 +370,7 @@ export class FormsPageComponent {
   templateData = { firstName: '', email: '' };
   selectedFrameworks: any[] = ['angular', 'react'];
   selectedCountries: any[] = ['tr', 'us'];
+  colors = ['primary', 'secondary', 'success', 'info', 'warning', 'danger', 'dark'];
 
   multiSelectOptions: SelectOption[] = [
     { label: 'Angular', value: 'angular' },
