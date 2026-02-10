@@ -559,6 +559,7 @@ export class LayoutComponent {
         { label: 'SIDEBAR.ICONS', icon: '', route: '/icons' },
         { label: 'SIDEBAR.GRID', icon: '', route: '/grid' },
         { label: 'SIDEBAR.FILE_UPLOAD', icon: '', route: '/file-upload' },
+        { label: 'SIDEBAR.EDITOR', icon: '', route: '/editor' },
       ]
     },
     {

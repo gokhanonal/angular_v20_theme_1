@@ -69,6 +69,29 @@
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+
+  // ngx-editor dark mode adjustments
+  .NgxEditor {
+    color: var(--text-primary);
+    background-color: var(--bg-card);
+  }
+
+  .NgxEditor__MenuBar {
+    background-color: var(--bg-body);
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .NgxEditor__MenuItem--Icon {
+    fill: var(--text-secondary);
+
+    &:hover {
+      fill: var(--text-primary);
+    }
+  }
+
+  .NgxEditor__MenuItem--Active {
+    background-color: var(--bg-sidebar-active);
+  }
 }
 
 [data-theme="theme1"] {
