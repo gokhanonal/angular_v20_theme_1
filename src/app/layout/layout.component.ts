@@ -84,10 +84,37 @@ interface MenuItem {
           </button>
 
           <!-- Notifications -->
-          <button class="btn-icon position-relative">
-            <i class="bi bi-bell"></i>
-            <span class="notification-badge">3</span>
-          </button>
+          <div class="dropdown" ngbDropdown>
+            <button class="btn-icon position-relative dropdown-toggle-no-caret" ngbDropdownToggle>
+              <i class="bi bi-bell"></i>
+              <span class="notification-badge">{{ messages().length }}</span>
+            </button>
+            <div class="dropdown-menu dropdown-menu-end p-0 shadow-lg notification-dropdown" ngbDropdownMenu>
+              <div class="dropdown-header-custom">
+                <h6 class="mb-0">Messages</h6>
+                <span class="badge badge-soft-pink">{{ messages().length }} Messages</span>
+              </div>
+              <div class="notification-list">
+                @for (msg of messages(); track msg.id) {
+                  <div class="notification-item">
+                    <div class="avatar-container">
+                      <img [src]="msg.image" class="avatar-img" [alt]="msg.name">
+                    </div>
+                    <div class="notification-content">
+                      <div class="notification-top">
+                        <span class="notification-name">{{ msg.name }}</span>
+                        <span class="notification-time" [class.text-success]="msg.isNew">{{ msg.time }}</span>
+                      </div>
+                      <p class="notification-text">{{ msg.text }}</p>
+                    </div>
+                  </div>
+                }
+              </div>
+              <div class="dropdown-footer-custom">
+                <button class="btn btn-view-all w-100">View All Messages</button>
+              </div>
+            </div>
+          </div>
 
           <!-- Language -->
           <div class="dropdown" ngbDropdown>
@@ -324,6 +351,109 @@ interface MenuItem {
       justify-content: center;
     }
 
+    // === Notification Dropdown ===
+    .notification-dropdown {
+      width: 350px;
+      border: 1px solid var(--border-color);
+      border-radius: 0.75rem;
+      overflow: hidden;
+      background: var(--bg-header);
+      backdrop-filter: blur(20px);
+    }
+
+    .dropdown-header-custom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.25rem;
+      border-bottom: 1px solid var(--border-color);
+
+      h6 { font-weight: 700; color: var(--text-primary); font-size: 1.1rem; }
+    }
+
+    .badge-soft-pink {
+      background: #fdf2f8;
+      color: #db2777;
+      font-size: 0.75rem;
+      padding: 0.4rem 0.75rem;
+      border-radius: 0.5rem;
+    }
+
+    .notification-list {
+      max-height: 380px;
+      overflow-y: auto;
+    }
+
+    .notification-item {
+      display: flex;
+      gap: 1rem;
+      padding: 1.25rem;
+      border-bottom: 1px solid var(--border-color);
+      transition: background 0.2s;
+      cursor: pointer;
+
+      &:hover { background: rgba(102, 126, 234, 0.04); }
+      &:last-child { border-bottom: none; }
+    }
+
+    .avatar-container {
+      flex-shrink: 0;
+      width: 48px;
+      height: 48px;
+      border-radius: 0.75rem;
+      overflow: hidden;
+    }
+
+    .avatar-img { width: 100%; height: 100%; object-fit: cover; }
+
+    .notification-content { flex: 1; min-width: 0; }
+
+    .notification-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.25rem;
+    }
+
+    .notification-name {
+      font-weight: 700;
+      color: var(--text-primary);
+      font-size: 0.95rem;
+    }
+
+    .notification-time {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    .notification-text {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .dropdown-footer-custom {
+      padding: 1rem 1.25rem;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .btn-view-all {
+      background: #94c160;
+      color: #fff;
+      font-weight: 700;
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+      transition: opacity 0.2s;
+      border: none;
+
+      &:hover { opacity: 0.9; color: #fff; }
+    }
+
+    .dropdown-toggle-no-caret::after { display: none !important; }
+
     .user-avatar {
       background: none;
       border: none;
@@ -372,6 +502,13 @@ export class LayoutComponent {
   sidebarCollapsed = signal(false);
   openMenus = signal<Record<string, boolean>>({});
   environment = environment;
+
+  messages = signal([
+    { id: 1, name: 'Hawaii Hilton', time: '11:07 am', text: 'Wanted to submit project by tomorrow....', image: 'https://i.pravatar.cc/150?u=1', isNew: false },
+    { id: 2, name: 'Hermoini', time: '12:32 am', text: 'Planning for ext big update....', image: 'https://i.pravatar.cc/150?u=2', isNew: false },
+    { id: 3, name: 'Buenda osas', time: '02:17 am', text: 'Ready to submit future data....', image: 'https://i.pravatar.cc/150?u=3', isNew: true },
+    { id: 4, name: 'Hermoini', time: '12:32 am', text: 'Planning for ext big update....', image: 'https://i.pravatar.cc/150?u=4', isNew: false }
+  ]);
 
   menuItems: MenuItem[] = [
     { label: 'SIDEBAR.DASHBOARD', icon: 'bi-grid-1x2-fill', route: '/dashboard' },
