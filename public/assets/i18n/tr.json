@@ -153,7 +153,17 @@
         "NO_ACCOUNT": "Hesabınız yok mu?",
         "HAS_ACCOUNT": "Zaten hesabınız var mı?",
         "WELCOME_BACK": "Tekrar Hoş Geldiniz",
-        "CREATE_ACCOUNT": "Hesap Oluştur"
+        "CREATE_ACCOUNT": "Hesap Oluştur",
+        "CAPTCHA": "Güvenlik Doğrulaması",
+        "ENTER_CAPTCHA": "Resimdeki karakterleri girin",
+        "CAPTCHA_ERROR": "Geçersiz CAPTCHA. Lütfen tekrar deneyin.",
+        "TWO_FACTOR_TITLE": "Kimlik Doğrulama",
+        "TWO_FACTOR_SUBTITLE": "Cihazınıza gönderilen 6 haneli kodu girin.",
+        "ENTER_OTP": "Doğrulama Kodu",
+        "VERIFY": "Kimliği Doğrula",
+        "DIDNT_RECEIVE_CODE": "Kod gelmedi mi?",
+        "RESEND_CODE": "Tekrar Gönder",
+        "BACK_TO_LOGIN": "Giriş ekranına dön"
     },
     "COMMON": {
         "LOADING": "Yükleniyor...",

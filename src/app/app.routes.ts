@@ -21,6 +21,7 @@ export const routes: Routes = [
         ]
     },
     { path: 'login', loadComponent: () => import('./pages/auth/login/login.component').then(m => m.LoginComponent) },
+    { path: 'two-factor', loadComponent: () => import('./pages/auth/two-factor/two-factor.component').then(m => m.TwoFactorComponent) },
     { path: 'register', loadComponent: () => import('./pages/auth/register/register.component').then(m => m.RegisterComponent) },
     { path: '**', loadComponent: () => import('./pages/not-found/not-found.component').then(m => m.NotFoundComponent) }
 ];

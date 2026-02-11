@@ -1,14 +1,15 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
+import { RecaptchaModule } from 'ng-recaptcha';
 
 @Component({
-    selector: 'app-login',
-    standalone: true,
-    imports: [CommonModule, FormsModule, RouterLink, TranslateModule],
-    template: `
+  selector: 'app-login',
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterLink, TranslateModule, RecaptchaModule],
+  template: `
     <div class="auth-container">
       <div class="auth-card animate-fade-in">
         <div class="auth-header">
@@ -37,6 +38,18 @@ import { TranslateModule } from '@ngx-translate/core';
               </button>
             </div>
           </div>
+
+          <!-- Google reCAPTCHA Section -->
+          <div class="mb-3 d-flex flex-column align-items-center">
+            <re-captcha
+              (resolved)="resolved($event)"
+              siteKey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI">
+            </re-captcha>
+            <div *ngIf="captchaError" class="text-danger small mt-1 animate-shake w-100 text-center">
+              <i class="bi bi-exclamation-circle me-1"></i>{{ 'AUTH.CAPTCHA_ERROR' | translate }}
+            </div>
+          </div>
+
           <div class="d-flex justify-content-between align-items-center mb-4">
             <div class="form-check">
               <input class="form-check-input" type="checkbox" id="remember">
@@ -62,7 +75,7 @@ import { TranslateModule } from '@ngx-translate/core';
       </div>
     </div>
   `,
-    styles: [`
+  styles: [`
     .auth-container {
       min-height: 100vh;
       display: flex;
@@ -97,11 +110,40 @@ import { TranslateModule } from '@ngx-translate/core';
       cursor: pointer;
       &:hover { text-decoration: underline; }
     }
+    .animate-shake {
+      animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+    }
+    @keyframes shake {
+      10%, 90% { transform: translate3d(-1px, 0, 0); }
+      20%, 80% { transform: translate3d(2px, 0, 0); }
+      30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+      40%, 60% { transform: translate3d(4px, 0, 0); }
+    }
   `]
 })
-export class LoginComponent {
-    email = '';
-    password = '';
-    showPw = false;
-    onLogin(): void { }
+export class LoginComponent implements OnInit {
+  email = '';
+  password = '';
+  showPw = false;
+  captchaResponse: string | null = null;
+  captchaError = false;
+
+  constructor(private router: Router) { }
+
+  ngOnInit(): void { }
+
+  resolved(captchaResponse: string | null) {
+    this.captchaResponse = captchaResponse;
+    this.captchaError = false;
+  }
+
+  onLogin(): void {
+    if (!this.captchaResponse) {
+      this.captchaError = true;
+      return;
+    }
+
+    // Success - Go to 2FA
+    this.router.navigate(['/two-factor']);
+  }
 }

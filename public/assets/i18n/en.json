@@ -153,7 +153,17 @@
     "NO_ACCOUNT": "Don't have an account?",
     "HAS_ACCOUNT": "Already have an account?",
     "WELCOME_BACK": "Welcome Back",
-    "CREATE_ACCOUNT": "Create Account"
+    "CREATE_ACCOUNT": "Create Account",
+    "CAPTCHA": "Security Verification",
+    "ENTER_CAPTCHA": "Enter characters from image",
+    "CAPTCHA_ERROR": "Invalid CAPTCHA. Please try again.",
+    "TWO_FACTOR_TITLE": "Identity Verification",
+    "TWO_FACTOR_SUBTITLE": "Enter the 6-digit code we sent to your device.",
+    "ENTER_OTP": "Verification Code",
+    "VERIFY": "Verify Identity",
+    "DIDNT_RECEIVE_CODE": "Didn't receive the code?",
+    "RESEND_CODE": "Resend Code",
+    "BACK_TO_LOGIN": "Back to login"
   },
   "COMMON": {
     "LOADING": "Loading...",

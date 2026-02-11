@@ -26,6 +26,7 @@ interface Column {
   sortable: boolean;
   filterable: boolean;
   sticky?: 'left' | 'right';
+  width?: number;
 }
 
 interface SortState {
@@ -99,7 +100,7 @@ interface SortState {
 
       <div class="card-body p-0">
         <div class="table-container shadow-inner">
-          <table class="table table-hover align-middle mb-0">
+          <table class="table table-hover align-middle mb-0" [style.table-layout]="resizingColumn ? 'fixed' : 'auto'">
             <thead class="table-light">
               <!-- Header Row -->
               <tr cdkDropList cdkDropListOrientation="horizontal" (cdkDropListDropped)="drop($event)">
@@ -107,10 +108,11 @@ interface SortState {
                   <th [class.sticky-left]="col.sticky === 'left'" 
                       [class.sticky-right]="col.sticky === 'right'"
                       [style.cursor]="col.sortable ? 'pointer' : 'default'"
+                      [style.width.px]="col.width"
                       (click)="onSort(col, $event)"
                       cdkDrag 
                       [cdkDragDisabled]="!!col.sticky">
-                    <div class="d-flex align-items-center justify-content-between gap-2">
+                    <div class="d-flex align-items-center justify-content-between gap-2 h-100">
                       <span class="text-nowrap">{{ col.label }}</span>
                       @if (col.sortable) {
                         <div class="sort-icons d-flex flex-column line-height-1">
@@ -119,6 +121,7 @@ interface SortState {
                         </div>
                       }
                     </div>
+                    <div class="resize-handle" (mousedown)="onResizeStart($event, col)"></div>
                   </th>
                 }
               </tr>
@@ -126,7 +129,8 @@ interface SortState {
               <tr class="filter-row">
                 @for (col of visibleColumns(); track col.key) {
                   <td [class.sticky-left]="col.sticky === 'left'" 
-                      [class.sticky-right]="col.sticky === 'right'">
+                      [class.sticky-right]="col.sticky === 'right'"
+                      [style.width.px]="col.width">
                     @if (col.filterable && col.key !== 'actions') {
                       <div class="filter-input-wrapper">
                         <input type="text" class="form-control form-control-sm filter-input" 
@@ -145,7 +149,8 @@ interface SortState {
                 <tr class="animate-fade-in">
                   @for (col of visibleColumns(); track col.key) {
                     <td [class.sticky-left]="col.sticky === 'left'" 
-                        [class.sticky-right]="col.sticky === 'right'">
+                        [class.sticky-right]="col.sticky === 'right'"
+                        [style.width.px]="col.width">
                       
                       @switch (col.key) {
                         @case ('name') {
@@ -245,7 +250,7 @@ interface SortState {
     }
 
     .table {
-      min-width: 1200px; /* Force horizontal scroll for fixed column demo */
+      min-width: 1200px;
       border-collapse: separate;
       border-spacing: 0;
     }
@@ -262,12 +267,36 @@ interface SortState {
       position: sticky;
       top: 0;
       z-index: 10;
+      overflow: hidden;
+      
+      &:hover .resize-handle { opacity: 1; }
+    }
+
+    .resize-handle {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      cursor: col-resize;
+      background: rgba(102, 126, 234, 0.2);
+      opacity: 0;
+      transition: all 0.2s;
+      z-index: 5;
+      
+      &:hover, &.resizing {
+        opacity: 1;
+        background: var(--color-primary);
+        width: 6px;
+      }
     }
 
     td { 
       padding: 1rem 1.25rem;
       border-bottom: 1px solid var(--border-color);
       white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     // === Sticky Columns ===
@@ -447,16 +476,48 @@ export class TablesComponent {
   columnFilters = signal<Record<string, string>>({});
   sortStates = signal<SortState[]>([]);
 
+  resizingColumn: Column | null = null;
+  startResizeX = 0;
+  startResizeWidth = 0;
+
   columns = signal<Column[]>([
-    { key: 'name', label: 'User', visible: true, sortable: true, filterable: true, sticky: 'left' },
-    { key: 'email', label: 'Email', visible: true, sortable: true, filterable: true },
-    { key: 'role', label: 'Role', visible: true, sortable: true, filterable: true },
-    { key: 'status', label: 'Status', visible: true, sortable: true, filterable: true },
-    { key: 'location', label: 'Location', visible: true, sortable: true, filterable: true },
-    { key: 'phone', label: 'Phone', visible: false, sortable: false, filterable: true },
-    { key: 'joinedDate', label: 'Joined', visible: true, sortable: true, filterable: false },
-    { key: 'actions', label: 'Actions', visible: true, sortable: false, filterable: false, sticky: 'right' }
+    { key: 'name', label: 'User', visible: true, sortable: true, filterable: true, sticky: 'left', width: 250 },
+    { key: 'email', label: 'Email', visible: true, sortable: true, filterable: true, width: 220 },
+    { key: 'role', label: 'Role', visible: true, sortable: true, filterable: true, width: 140 },
+    { key: 'status', label: 'Status', visible: true, sortable: true, filterable: true, width: 120 },
+    { key: 'location', label: 'Location', visible: true, sortable: true, filterable: true, width: 180 },
+    { key: 'phone', label: 'Phone', visible: false, sortable: false, filterable: true, width: 150 },
+    { key: 'joinedDate', label: 'Joined', visible: true, sortable: true, filterable: false, width: 130 },
+    { key: 'actions', label: 'Actions', visible: true, sortable: false, filterable: false, sticky: 'right', width: 120 }
   ]);
+
+  onResizeStart(event: MouseEvent, col: Column): void {
+    event.stopPropagation();
+    event.preventDefault();
+    this.resizingColumn = col;
+    this.startResizeX = event.pageX;
+    this.startResizeWidth = col.width || 150;
+
+    const onMouseMove = (moveEvent: MouseEvent) => {
+      if (this.resizingColumn) {
+        const delta = moveEvent.pageX - this.startResizeX;
+        const newWidth = Math.max(80, this.startResizeWidth + delta);
+
+        this.columns.update(cols => {
+          return cols.map(c => c.key === this.resizingColumn?.key ? { ...c, width: newWidth } : c);
+        });
+      }
+    };
+
+    const onMouseUp = () => {
+      this.resizingColumn = null;
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    };
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  }
 
   allUsers: User[] = [
     { id: 1, name: 'John Doe', email: 'john@example.com', role: 'Admin', status: 'Active', avatar: 'var(--gradient-primary)', initials: 'JD', location: 'New York, USA', phone: '+1 234 567 890', joinedDate: '2023-01-15', lastLogin: '2 hours ago' },
