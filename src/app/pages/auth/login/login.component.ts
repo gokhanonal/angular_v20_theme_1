@@ -2,15 +2,22 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { RecaptchaModule } from 'ng-recaptcha';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink, TranslateModule, RecaptchaModule],
   template: `
-    <div class="auth-container">
+    <div class="auth-container" [style.backgroundImage]="'url(' + backgroundImage + ')'">
+      <!-- Language Switcher -->
+      <div class="lang-switcher animate-fade-in">
+        <button class="btn btn-sm" [class.btn-primary]="currentLang === 'en'" (click)="changeLanguage('en')">EN</button>
+        <button class="btn btn-sm ms-1" [class.btn-primary]="currentLang === 'tr'" (click)="changeLanguage('tr')">TR</button>
+      </div>
+
       <div class="auth-card animate-fade-in">
         <div class="auth-header">
           <div class="auth-logo">
@@ -25,7 +32,7 @@ import { RecaptchaModule } from 'ng-recaptcha';
             <label class="form-label">{{ 'AUTH.EMAIL' | translate }}</label>
             <div class="input-group">
               <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-              <input type="email" class="form-control" [(ngModel)]="email" name="email" placeholder="john&#64;example.com">
+              <input type="text" class="form-control" [(ngModel)]="username" name="username" placeholder="admin">
             </div>
           </div>
           <div class="mb-3">
@@ -48,6 +55,10 @@ import { RecaptchaModule } from 'ng-recaptcha';
             <div *ngIf="captchaError" class="text-danger small mt-1 animate-shake w-100 text-center">
               <i class="bi bi-exclamation-circle me-1"></i>{{ 'AUTH.CAPTCHA_ERROR' | translate }}
             </div>
+          </div>
+
+          <div *ngIf="loginError" class="alert alert-danger py-2 small mb-3">
+            <i class="bi bi-exclamation-triangle me-2"></i>Invalid credentials
           </div>
 
           <div class="d-flex justify-content-between align-items-center mb-4">
@@ -79,10 +90,37 @@ import { RecaptchaModule } from 'ng-recaptcha';
     .auth-container {
       min-height: 100vh;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       background: var(--bg-body);
       padding: 2rem;
+      position: relative;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      
+      &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(2px);
+        z-index: 0;
+      }
+    }
+    .lang-switcher, .auth-card {
+      position: relative;
+      z-index: 1;
+    }
+    .lang-switcher {
+      position: absolute;
+      top: 2rem;
+      right: 2rem;
+      background: var(--bg-card);
+      padding: 0.5rem;
+      border-radius: 0.5rem;
+      box-shadow: var(--shadow-sm);
     }
     .auth-card {
       width: 100%;
@@ -122,15 +160,48 @@ import { RecaptchaModule } from 'ng-recaptcha';
   `]
 })
 export class LoginComponent implements OnInit {
-  email = '';
+  username = '';
   password = '';
   showPw = false;
   captchaResponse: string | null = null;
   captchaError = false;
+  loginError = false;
+  currentLang = 'en';
+  backgroundImage = '';
 
-  constructor(private router: Router) { }
+  constructor(
+    private router: Router,
+    private translate: TranslateService,
+    private authService: AuthService
+  ) {
+    this.currentLang = this.translate.currentLang || this.translate.defaultLang || 'en';
 
-  ngOnInit(): void { }
+    // Sync language if it changes elsewhere
+    this.translate.onLangChange.subscribe(event => {
+      this.currentLang = event.lang;
+    });
+  }
+
+  ngOnInit(): void {
+    this.updateBackground();
+  }
+
+  updateBackground(): void {
+    const hour = new Date().getHours();
+    let image = 'day.png';
+
+    if (hour >= 17 && hour < 20) {
+      image = 'evening.jpg';
+    } else if (hour >= 20 || hour < 6) {
+      image = 'night.jpg';
+    }
+
+    this.backgroundImage = `assets/i18n/images/background/${image}`;
+  }
+
+  changeLanguage(lang: string) {
+    this.translate.use(lang);
+  }
 
   resolved(captchaResponse: string | null) {
     this.captchaResponse = captchaResponse;
@@ -138,12 +209,24 @@ export class LoginComponent implements OnInit {
   }
 
   onLogin(): void {
+    // For local dev/mock, we'll be more lenient if needed, 
+    // but the user should solve the standard test reCAPTCHA.
     if (!this.captchaResponse) {
       this.captchaError = true;
       return;
     }
 
-    // Success - Go to 2FA
-    this.router.navigate(['/two-factor']);
+    const success = this.authService.login({
+      email: this.username.trim(),
+      password: this.password.trim()
+    });
+
+    if (success) {
+      this.loginError = false;
+      this.router.navigate(['/two-factor']);
+    } else {
+      this.loginError = true;
+      // Shake animation effect is already in template
+    }
   }
 }

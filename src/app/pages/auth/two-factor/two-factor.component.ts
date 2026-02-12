@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
-    selector: 'app-two-factor',
-    standalone: true,
-    imports: [CommonModule, FormsModule, RouterLink, TranslateModule],
-    template: `
-    <div class="auth-container">
+  selector: 'app-two-factor',
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterLink, TranslateModule],
+  template: `
+    <div class="auth-container" [style.backgroundImage]="'url(' + backgroundImage + ')'">
       <div class="auth-card animate-fade-in">
         <div class="auth-header">
           <div class="auth-logo">
@@ -35,6 +36,9 @@ import { TranslateModule } from '@ngx-translate/core';
                 >
               }
             </div>
+            <div *ngIf="otpError" class="text-danger small mt-2 text-center animate-shake">
+              <i class="bi bi-exclamation-circle me-1"></i>Invalid verification code
+            </div>
           </div>
 
           <button type="submit" class="btn btn-gradient-primary w-100 mb-3" [disabled]="!isOtpComplete()">
@@ -55,7 +59,7 @@ import { TranslateModule } from '@ngx-translate/core';
       </div>
     </div>
   `,
-    styles: [`
+  styles: [`
     .auth-container {
       min-height: 100vh;
       display: flex;
@@ -63,6 +67,23 @@ import { TranslateModule } from '@ngx-translate/core';
       justify-content: center;
       background: var(--bg-body);
       padding: 2rem;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      position: relative;
+
+      &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(2px);
+        z-index: 0;
+      }
+    }
+    .auth-card {
+      position: relative;
+      z-index: 1;
     }
     .auth-card {
       width: 100%;
@@ -110,38 +131,72 @@ import { TranslateModule } from '@ngx-translate/core';
         box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
       }
     }
+    .animate-shake {
+      animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+    }
+    @keyframes shake {
+      10%, 90% { transform: translate3d(-1px, 0, 0); }
+      20%, 80% { transform: translate3d(2px, 0, 0); }
+      30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+      40%, 60% { transform: translate3d(4px, 0, 0); }
+    }
   `]
 })
 export class TwoFactorComponent implements OnInit {
-    otpDigits = ['', '', '', '', '', ''];
+  otpDigits = ['', '', '', '', '', ''];
+  otpError = false;
+  backgroundImage = '';
 
-    constructor(private router: Router) { }
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) { }
 
-    ngOnInit(): void { }
+  ngOnInit(): void {
+    this.updateBackground();
+  }
 
-    onKeyUp(event: any, index: number): void {
-        const key = event.key;
-        if (key >= '0' && key <= '9') {
-            if (index < 5) {
-                const nextInput = event.target.nextElementSibling as HTMLInputElement;
-                if (nextInput) nextInput.focus();
-            }
-        } else if (key === 'Backspace') {
-            if (index > 0) {
-                const prevInput = event.target.previousElementSibling as HTMLInputElement;
-                if (prevInput) prevInput.focus();
-            }
-        }
+  updateBackground(): void {
+    const hour = new Date().getHours();
+    let image = 'day.png';
+
+    if (hour >= 17 && hour < 20) {
+      image = 'evening.jpg';
+    } else if (hour >= 20 || hour < 6) {
+      image = 'night.jpg';
     }
 
-    isOtpComplete(): boolean {
-        return this.otpDigits.every(digit => digit !== '');
-    }
+    this.backgroundImage = `assets/i18n/images/background/${image}`;
+  }
 
-    onVerify(): void {
-        if (this.isOtpComplete()) {
-            // Simulate verification
-            this.router.navigate(['/dashboard']);
-        }
+  onKeyUp(event: any, index: number): void {
+    const key = event.key;
+    if (key >= '0' && key <= '9') {
+      if (index < 5) {
+        const nextInput = event.target.nextElementSibling as HTMLInputElement;
+        if (nextInput) nextInput.focus();
+      }
+    } else if (key === 'Backspace') {
+      if (index > 0) {
+        const prevInput = event.target.previousElementSibling as HTMLInputElement;
+        if (prevInput) prevInput.focus();
+      }
     }
+  }
+
+  isOtpComplete(): boolean {
+    return this.otpDigits.every(digit => digit !== '');
+  }
+
+  onVerify(): void {
+    if (this.isOtpComplete()) {
+      const code = this.otpDigits.join('');
+      if (this.authService.verifyOtp(code)) {
+        this.otpError = false;
+        this.router.navigate(['/dashboard']);
+      } else {
+        this.otpError = true;
+      }
+    }
+  }
 }

@@ -15,7 +15,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideHttpClient(),
     provideTranslateService({
-      defaultLanguage: 'en',
+      defaultLanguage: (navigator.language.startsWith('tr') ? 'tr' : 'en'),
       loader: {
         provide: TranslateLoader,
         useClass: TranslateHttpLoader,

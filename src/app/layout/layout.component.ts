@@ -1,11 +1,12 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, signal, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { ThemeService } from '../services/theme.service';
 import { LoggerService } from '../services/logger.service';
 import { environment } from '../../environments/environment';
-import { CommonModule } from '@angular/common';
-import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import { AuthService } from '../core/services/auth.service';
 
 interface MenuItem {
   label: string;
@@ -124,10 +125,10 @@ interface MenuItem {
               <i class="bi bi-bell"></i>
               <span class="notification-badge">{{ messages().length }}</span>
             </button>
-            <div class="dropdown-menu dropdown-menu-end p-0 shadow-lg notification-dropdown" ngbDropdownMenu>
+            <div class="dropdown-menu dropdown-menu-end notification-dropdown" ngbDropdownMenu>
               <div class="dropdown-header-custom">
-                <h6 class="mb-0">Messages</h6>
-                <span class="badge badge-soft-pink">{{ messages().length }} Messages</span>
+                <h6>{{ 'HEADER.NOTIFICATIONS' | translate }}</h6>
+                <span class="badge-soft-pink">{{ unreadMessagesCount() }} {{ 'HEADER.NEW' | translate }}</span>
               </div>
               <div class="notification-list">
                 @for (msg of messages(); track msg.id) {
@@ -138,7 +139,7 @@ interface MenuItem {
                     <div class="notification-content">
                       <div class="notification-top">
                         <span class="notification-name">{{ msg.name }}</span>
-                        <span class="notification-time" [class.text-success]="msg.isNew">{{ msg.time }}</span>
+                        <span class="notification-time">{{ msg.time }}</span>
                       </div>
                       <p class="notification-text">{{ msg.text }}</p>
                     </div>
@@ -146,7 +147,7 @@ interface MenuItem {
                 }
               </div>
               <div class="dropdown-footer-custom">
-                <button class="btn btn-view-all w-100">View All Messages</button>
+                <button class="btn w-100 btn-view-all">{{ 'HEADER.VIEW_ALL_MESSAGES' | translate }}</button>
               </div>
             </div>
           </div>
@@ -171,7 +172,7 @@ interface MenuItem {
               <li><a class="dropdown-item" routerLink="/profile"><i class="bi bi-person me-2"></i>{{ 'HEADER.PROFILE' | translate }}</a></li>
               <li><a class="dropdown-item"><i class="bi bi-gear me-2"></i>{{ 'HEADER.SETTINGS' | translate }}</a></li>
               <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item text-danger"><i class="bi bi-box-arrow-right me-2"></i>{{ 'HEADER.LOGOUT' | translate }}</a></li>
+              <li><a class="dropdown-item text-danger" (click)="onLogout()" style="cursor: pointer"><i class="bi bi-box-arrow-right me-2"></i>{{ 'HEADER.LOGOUT' | translate }}</a></li>
             </ul>
           </div>
         </div>
@@ -573,12 +574,22 @@ export class LayoutComponent {
     }
   ];
 
+  unreadMessagesCount = () => this.messages().filter(m => m.isNew).length;
+
   constructor(
     public themeService: ThemeService,
     private translate: TranslateService,
-    private logger: LoggerService
+    private logger: LoggerService,
+    private authService: AuthService,
+    private router: Router
   ) {
     this.logger.info('Layout initialized', { env: environment.envName });
+  }
+
+  onLogout(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+    this.logger.info('User logged out');
   }
 
   toggleSidebar(): void {
