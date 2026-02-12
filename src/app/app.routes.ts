@@ -17,7 +17,8 @@ export const routes: Routes = [
             { path: 'grid', loadComponent: () => import('./pages/grid/grid.component').then(m => m.GridComponent) },
             { path: 'file-upload', loadComponent: () => import('./pages/file-upload/file-upload.component').then(m => m.FileUploadComponent) },
             { path: 'editor', loadComponent: () => import('./pages/editor/editor.component').then(m => m.EditorComponent) },
-            { path: 'profile', loadComponent: () => import('./pages/profile/profile.component').then(m => m.ProfileComponent) },
+            { path: 'profile/:id', loadComponent: () => import('./pages/profile/profile.component').then(m => m.ProfileComponent) },
+            { path: 'profile', redirectTo: 'profile/1', pathMatch: 'full' },
         ]
     },
     { path: 'login', loadComponent: () => import('./pages/auth/login/login.component').then(m => m.LoginComponent) },

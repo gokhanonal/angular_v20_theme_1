@@ -3,17 +3,17 @@ import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
-    selector: 'app-ui-elements',
-    standalone: true,
-    imports: [CommonModule, TranslateModule],
-    template: `
+  selector: 'app-ui-elements',
+  standalone: true,
+  imports: [CommonModule, TranslateModule],
+  template: `
     <div class="page-header">
       <h2>{{ 'UI_ELEMENTS.TITLE' | translate }}</h2>
     </div>
 
     <!-- Buttons -->
     <div class="card mb-4">
-      <div class="card-header"><h6 class="mb-0">{{ 'UI_ELEMENTS.BUTTONS' | translate }}</h6></div>
+      <div class="card-header d-flex justify-content-between align-items-center"><h6 class="mb-0">{{ 'UI_ELEMENTS.BUTTONS' | translate }}</h6></div>
       <div class="card-body">
         <div class="d-flex flex-wrap gap-2 mb-3">
           <button class="btn btn-primary">Primary</button>
@@ -53,7 +53,7 @@ import { TranslateModule } from '@ngx-translate/core';
 
     <!-- Badges -->
     <div class="card mb-4">
-      <div class="card-header"><h6 class="mb-0">{{ 'UI_ELEMENTS.BADGES' | translate }}</h6></div>
+      <div class="card-header d-flex justify-content-between align-items-center"><h6 class="mb-0">{{ 'UI_ELEMENTS.BADGES' | translate }}</h6></div>
       <div class="card-body">
         <div class="d-flex flex-wrap gap-2 mb-3">
           <span class="badge bg-primary">Primary</span>
@@ -244,22 +244,22 @@ import { TranslateModule } from '@ngx-translate/core';
   `
 })
 export class UiElementsComponent {
-    toasts = signal<{ id: number; type: string; title: string; message: string }[]>([]);
-    private toastId = 0;
+  toasts = signal<{ id: number; type: string; title: string; message: string }[]>([]);
+  private toastId = 0;
 
-    showToast(type: string): void {
-        const titles: Record<string, string> = { success: 'Success', error: 'Error', info: 'Information' };
-        const messages: Record<string, string> = {
-            success: 'Operation completed successfully!',
-            error: 'Something went wrong. Please try again.',
-            info: 'Here is some useful information.'
-        };
-        const id = ++this.toastId;
-        this.toasts.update(t => [...t, { id, type, title: titles[type], message: messages[type] }]);
-        setTimeout(() => this.removeToast(id), 4000);
-    }
+  showToast(type: string): void {
+    const titles: Record<string, string> = { success: 'Success', error: 'Error', info: 'Information' };
+    const messages: Record<string, string> = {
+      success: 'Operation completed successfully!',
+      error: 'Something went wrong. Please try again.',
+      info: 'Here is some useful information.'
+    };
+    const id = ++this.toastId;
+    this.toasts.update(t => [...t, { id, type, title: titles[type], message: messages[type] }]);
+    setTimeout(() => this.removeToast(id), 4000);
+  }
 
-    removeToast(id: number): void {
-        this.toasts.update(t => t.filter(toast => toast.id !== id));
-    }
+  removeToast(id: number): void {
+    this.toasts.update(t => t.filter(toast => toast.id !== id));
+  }
 }
