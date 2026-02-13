@@ -1,8 +1,9 @@
 import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
+import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import { filter } from 'rxjs/operators';
 import { ThemeService } from '../services/theme.service';
 import { LoggerService } from '../services/logger.service';
 import { environment } from '../../environments/environment';
@@ -58,6 +59,59 @@ interface MenuItem {
       </nav>
 
       <div class="sidebar-footer" *ngIf="!sidebarCollapsed()">
+        <div class="footer-actions">
+          <!-- Theme selector -->
+          <div class="dropdown" ngbDropdown placement="top-start">
+            <button class="btn-icon-sm dropdown-toggle" ngbDropdownToggle [title]="'HEADER.THEME_TOGGLE' | translate">
+              <i class="bi" [ngClass]="{
+                'bi-sun-fill': themeService.currentTheme() === 'light',
+                'bi-moon-fill': themeService.currentTheme() === 'dark',
+                'bi-palette-fill': themeService.currentTheme() === 'theme1',
+                'bi-window-sidebar': themeService.currentTheme() === 'theme2',
+                'bi-stars': themeService.currentTheme() === 'theme3'
+              }"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-start" ngbDropdownMenu>
+              <li>
+                <button class="dropdown-item d-flex align-items-center gap-2" (click)="themeService.setTheme('light')">
+                  <i class="bi bi-sun"></i> Light
+                </button>
+              </li>
+              <li>
+                <button class="dropdown-item d-flex align-items-center gap-2" (click)="themeService.setTheme('dark')">
+                  <i class="bi bi-moon"></i> Dark
+                </button>
+              </li>
+              <li>
+                <button class="dropdown-item d-flex align-items-center gap-2" (click)="themeService.setTheme('theme1')">
+                  <i class="bi bi-palette"></i> Theme1
+                </button>
+              </li>
+              <li>
+                <button class="dropdown-item d-flex align-items-center gap-2" (click)="themeService.setTheme('theme2')">
+                  <i class="bi bi-window-sidebar"></i> Theme2
+                </button>
+              </li>
+              <li>
+                <button class="dropdown-item d-flex align-items-center gap-2" (click)="themeService.setTheme('theme3')">
+                  <i class="bi bi-stars"></i> Theme3
+                </button>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Language -->
+          <div class="dropdown" ngbDropdown placement="top-start">
+            <button class="btn-icon-sm dropdown-toggle" ngbDropdownToggle>
+              <i class="bi bi-translate"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-start" ngbDropdownMenu>
+              <li><button class="dropdown-item" (click)="switchLang('en')">🇬🇧 English</button></li>
+              <li><button class="dropdown-item" (click)="switchLang('tr')">🇹🇷 Türkçe</button></li>
+            </ul>
+          </div>
+        </div>
+
         <div class="env-badge">
           <i class="bi bi-server"></i>
           <span>{{ environment.envName | uppercase }}</span>
@@ -79,46 +133,6 @@ interface MenuItem {
           </div>
         </div>
         <div class="header-right">
-          <!-- Theme selector -->
-          <div class="dropdown" ngbDropdown>
-            <button class="btn-icon dropdown-toggle" ngbDropdownToggle [title]="'HEADER.THEME_TOGGLE' | translate">
-              <i class="bi" [ngClass]="{
-                'bi-sun-fill': themeService.currentTheme() === 'light',
-                'bi-moon-fill': themeService.currentTheme() === 'dark',
-                'bi-palette-fill': themeService.currentTheme() === 'theme1',
-                'bi-window-sidebar': themeService.currentTheme() === 'theme2',
-                'bi-stars': themeService.currentTheme() === 'theme3'
-              }"></i>
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end" ngbDropdownMenu>
-              <li>
-                <button class="dropdown-item d-flex align-items-center gap-2" (click)="themeService.setTheme('light')">
-                  <i class="bi bi-sun"></i> Light
-                </button>
-              </li>
-              <li>
-                <button class="dropdown-item d-flex align-items-center gap-2" (click)="themeService.setTheme('dark')">
-                  <i class="bi bi-moon"></i> Dark
-                </button>
-              </li>
-              <li>
-                <button class="dropdown-item d-flex align-items-center gap-2" (click)="themeService.setTheme('theme1')">
-                  <i class="bi bi-palette"></i> Theme1 (Pastel)
-                </button>
-              </li>
-              <li>
-                <button class="dropdown-item d-flex align-items-center gap-2" (click)="themeService.setTheme('theme2')">
-                  <i class="bi bi-window-sidebar"></i> Theme2 (Flat)
-                </button>
-              </li>
-              <li>
-                <button class="dropdown-item d-flex align-items-center gap-2" (click)="themeService.setTheme('theme3')">
-                  <i class="bi bi-stars"></i> Theme3 (Vibrant)
-                </button>
-              </li>
-            </ul>
-          </div>
-
           <!-- Notifications -->
           <div class="dropdown" ngbDropdown>
             <button class="btn-icon position-relative dropdown-toggle-no-caret" ngbDropdownToggle>
@@ -150,17 +164,6 @@ interface MenuItem {
                 <button class="btn w-100 btn-view-all">{{ 'HEADER.VIEW_ALL_MESSAGES' | translate }}</button>
               </div>
             </div>
-          </div>
-
-          <!-- Language -->
-          <div class="dropdown" ngbDropdown>
-            <button class="btn-icon dropdown-toggle" ngbDropdownToggle>
-              <i class="bi bi-translate"></i>
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end" ngbDropdownMenu>
-              <li><button class="dropdown-item" (click)="switchLang('en')">🇬🇧 English</button></li>
-              <li><button class="dropdown-item" (click)="switchLang('tr')">🇹🇷 Türkçe</button></li>
-            </ul>
           </div>
 
           <!-- User -->
@@ -286,18 +289,51 @@ interface MenuItem {
     .sidebar-footer {
       padding: 1rem 1.5rem;
       border-top: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .footer-actions {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .btn-icon-sm {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      width: 32px;
+      height: 32px;
+      border-radius: 0.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      // color: rgba(255, 255, 255, 0.6);
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: #667eea;
+      // background: rgba(102, 126, 234, 0.1);
+      padding: 0.3rem 0.6rem;
+
+      &:hover {
+        color: val(--btn-primary);
+        border-color: rgba(255, 255, 255, 0.2);
+      }
     }
 
     .env-badge {
       display: flex;
       align-items: center;
       gap: 0.4rem;
-      font-size: 0.7rem;
+      font-size: 0.65rem;
       font-weight: 600;
       color: #667eea;
       background: rgba(102, 126, 234, 0.1);
-      padding: 0.35rem 0.75rem;
+      padding: 0.3rem 0.6rem;
       border-radius: 1rem;
+      align-self: flex-start;
     }
 
     // === Main ===
@@ -584,6 +620,35 @@ export class LayoutComponent {
     private router: Router
   ) {
     this.logger.info('Layout initialized', { env: environment.envName });
+
+    // Handle navigation events
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => {
+      this.updateMenuState();
+
+      // Auto-collapse on mobile (md breakpoint is 992px)
+      if (window.innerWidth < 992) {
+        this.sidebarCollapsed.set(true);
+      }
+    });
+
+    // Initial state
+    this.updateMenuState();
+  }
+
+  private updateMenuState(): void {
+    const url = this.router.url;
+    this.menuItems.forEach(item => {
+      if (item.children) {
+        const hasActiveChild = item.children.some(child =>
+          child.route && url.startsWith(child.route)
+        );
+        if (hasActiveChild) {
+          this.openMenus.update(menus => ({ ...menus, [item.label]: true }));
+        }
+      }
+    });
   }
 
   onLogout(): void {
